@@ -1,0 +1,59 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --sand: #F5EFE6;
+  --terracotta: #C65D3B;
+  --indigo: #2E3A59;
+  --green: #3F6B5B;
+  --gold: #D9A441;
+  --ink: #1F2937;
+  --line: #E5DED2;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background-color: var(--sand);
+  color: var(--ink);
+  font-family: var(--font-inter), sans-serif;
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--sand);
+  color: var(--ink);
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom scrollbar matching heritage parchment theme */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F5EFE6;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #D6CCC0;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #C65D3B;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
