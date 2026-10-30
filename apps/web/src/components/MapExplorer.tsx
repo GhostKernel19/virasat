@@ -131,6 +131,15 @@ export function MapExplorer({
 
       markersRef.current.set(place.id, { marker, element: el });
     });
+
+    // Fit map to the bounds of all visible places with padding 60 and maxZoom 6
+    if (places.length > 0) {
+      const bounds = new maplibregl.LngLatBounds();
+      places.forEach((place) => {
+        bounds.extend([place.lng, place.lat]);
+      });
+      map.fitBounds(bounds, { padding: 60, maxZoom: 6 });
+    }
   }, [places, mapLoaded, onSelectPlace, shouldReduceMotion]);
 
   // Update Marker visual highlight and scale based on hovered and selected states
@@ -169,22 +178,6 @@ export function MapExplorer({
       }
     });
   }, [selectedPlaceId, hoveredPlaceId]);
-
-  // Fly to selected place when selection changes
-  useEffect(() => {
-    const map = mapRef.current;
-    if (!map || !selectedPlace) return;
-
-    if (shouldReduceMotion) {
-      map.setCenter([selectedPlace.lng, selectedPlace.lat]);
-    } else {
-      map.easeTo({
-        center: [selectedPlace.lng, selectedPlace.lat],
-        zoom: Math.max(map.getZoom(), 6),
-        duration: 900,
-      });
-    }
-  }, [selectedPlace, shouldReduceMotion]);
 
   const displaySelectedTitle =
     language === "mr" && selectedPlace?.marathiName

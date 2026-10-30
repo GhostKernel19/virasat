@@ -31,6 +31,37 @@ export interface HeritageItemRecord {
   updated_at: string;
 }
 
+export interface MediaRecord {
+  id: string;
+  item_id: string;
+  url: string;
+  caption: string | null;
+  mime_type: string | null;
+  is_illustrative: boolean;
+  created_at: string;
+}
+
+export interface OCRTextRecord {
+  id: string;
+  media_id: string;
+  original_text: string;
+  language: string;
+  confidence: number | null;
+  lines: unknown;
+  is_illustrative: boolean;
+  created_at: string;
+}
+
+export interface TranslationRecord {
+  id: string;
+  ocr_id: string;
+  language: string;
+  text: string;
+  model: string | null;
+  is_illustrative: boolean;
+  created_at: string;
+}
+
 export interface Database {
   public: {
     Tables: {
@@ -44,12 +75,26 @@ export interface Database {
         Insert: Partial<HeritageItemRecord> & Pick<HeritageItemRecord, "place_id" | "title">;
         Update: Partial<HeritageItemRecord>;
       };
+      media: {
+        Row: MediaRecord;
+        Insert: Partial<MediaRecord>;
+        Update: Partial<MediaRecord>;
+      };
+      ocr_texts: {
+        Row: OCRTextRecord;
+        Insert: Partial<OCRTextRecord>;
+        Update: Partial<OCRTextRecord>;
+      };
+      translations: {
+        Row: TranslationRecord;
+        Insert: Partial<TranslationRecord>;
+        Update: Partial<TranslationRecord>;
+      };
     };
   };
 }
 
-export const supabase = createClient<Database>(
+export const supabase = createClient(
   supabaseUrl,
   supabasePublishableKey
 );
-
