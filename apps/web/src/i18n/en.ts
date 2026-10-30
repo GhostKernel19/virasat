@@ -53,6 +53,11 @@ export interface TranslationDictionary {
       subtitle: string;
       badge: string;
       status: string;
+      selectedPlace: string;
+      viewPlaceDossier: string;
+      selectPlaceHint: string;
+      loadingPlaces: string;
+      noPlacesFound: string;
     };
     search: {
       title: string;
@@ -130,6 +135,11 @@ export const en: TranslationDictionary = {
       subtitle: "Four places. Countless connections across western and southern India.",
       badge: "SPATIAL EXPLORER",
       status: "Explore interface ready. Map and split-view records will mount here.",
+      selectedPlace: "Selected place",
+      viewPlaceDossier: "View Place Dossier",
+      selectPlaceHint: "Click a pin or card to inspect details",
+      loadingPlaces: "Loading heritage atlas...",
+      noPlacesFound: "No places match the selected filter.",
     },
     search: {
       title: "Archival Search & Spatial Index",

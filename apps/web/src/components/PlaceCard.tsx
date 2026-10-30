@@ -20,6 +20,8 @@ export interface PlaceCardProps {
   isIllustrative?: boolean;
   isSelected?: boolean;
   onClick?: () => void;
+  onMouseEnter?: () => void;
+  onMouseLeave?: () => void;
   href?: string;
   className?: string;
 }
@@ -37,6 +39,8 @@ export function PlaceCard({
   isIllustrative = true,
   isSelected = false,
   onClick,
+  onMouseEnter,
+  onMouseLeave,
   href,
   className = "",
 }: PlaceCardProps) {
@@ -51,6 +55,8 @@ export function PlaceCard({
     <div
       data-place-id={id}
       onClick={onClick}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
       className={`group relative flex items-start gap-3.5 p-3.5 rounded-lg border transition-all text-left bg-sand-50/90 ${
         isSelected
           ? "border-terracotta bg-white shadow-md ring-1 ring-terracotta/20"
