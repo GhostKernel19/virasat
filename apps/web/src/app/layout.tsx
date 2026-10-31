@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Fraunces, Inter, Mukta } from "next/font/google";
 import "./globals.css";
 import { LanguageProvider } from "@/i18n";
+import { FallingLeaves } from "@/components/motion";
 
 const fraunces = Fraunces({
   subsets: ["latin"],
@@ -41,7 +42,8 @@ export default function RootLayout({
       lang="en"
       className={`${inter.variable} ${fraunces.variable} ${mukta.variable}`}
     >
-      <body className="bg-sand text-ink font-sans antialiased min-h-screen flex flex-col">
+      <body className="bg-sand text-ink font-sans antialiased min-h-screen flex flex-col relative">
+        <FallingLeaves />
         <LanguageProvider>{children}</LanguageProvider>
       </body>
     </html>

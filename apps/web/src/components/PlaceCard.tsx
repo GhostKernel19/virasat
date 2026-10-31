@@ -6,6 +6,7 @@ import Link from "next/link";
 import { ArrowUpRight, Check, Landmark } from "lucide-react";
 import { Badge } from "./Badge";
 import { useLanguage } from "@/i18n";
+import { useCardHover } from "@/components/motion";
 
 export interface PlaceCardProps {
   id: string;
@@ -46,6 +47,10 @@ export function PlaceCard({
 }: PlaceCardProps) {
   const { language, t } = useLanguage();
   const [imageError, setImageError] = useState(false);
+  const cardRef = useCardHover<HTMLDivElement>({
+    scale: 1.03,
+    glowColorVar: "--accent-glow",
+  });
 
   const displayTitle = language === "mr" && marathiTitle ? marathiTitle : title;
 
@@ -53,6 +58,7 @@ export function PlaceCard({
 
   const cardContent = (
     <div
+      ref={cardRef}
       data-place-id={id}
       onClick={onClick}
       onMouseEnter={onMouseEnter}

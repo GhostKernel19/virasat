@@ -41,6 +41,52 @@ export default function ExplorePage() {
   const [selectedPlaceId, setSelectedPlaceId] = useState<string | null>(null);
   const [hoveredPlaceId, setHoveredPlaceId] = useState<string | null>(null);
 
+  // Restore activeFilter and selectedPlaceId from sessionStorage on mount (only in useEffect)
+  useEffect(() => {
+    try {
+      const saved = sessionStorage.getItem("virasat_explore_state");
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (
+          parsed.activeFilter &&
+          ["all", "ocr", "stepwells", "forts"].includes(parsed.activeFilter)
+        ) {
+          setActiveFilter(parsed.activeFilter as FilterCategory);
+        }
+        if (parsed.selectedPlaceId) {
+          setSelectedPlaceId(parsed.selectedPlaceId);
+        }
+      }
+    } catch {
+      // Ignore sessionStorage read errors
+    }
+  }, []);
+
+  // Save activeFilter to sessionStorage when it changes
+  useEffect(() => {
+    try {
+      const saved = sessionStorage.getItem("virasat_explore_state");
+      const state = saved ? JSON.parse(saved) : {};
+      state.activeFilter = activeFilter;
+      sessionStorage.setItem("virasat_explore_state", JSON.stringify(state));
+    } catch {
+      // Ignore sessionStorage write errors
+    }
+  }, [activeFilter]);
+
+  // Save selectedPlaceId to sessionStorage when it changes
+  useEffect(() => {
+    if (!selectedPlaceId) return;
+    try {
+      const saved = sessionStorage.getItem("virasat_explore_state");
+      const state = saved ? JSON.parse(saved) : {};
+      state.selectedPlaceId = selectedPlaceId;
+      sessionStorage.setItem("virasat_explore_state", JSON.stringify(state));
+    } catch {
+      // Ignore sessionStorage write errors
+    }
+  }, [selectedPlaceId]);
+
   // Load places from Supabase on mount
   useEffect(() => {
     let isMounted = true;
@@ -51,7 +97,12 @@ export default function ExplorePage() {
         if (isMounted) {
           setPlaces(data);
           if (data.length > 0) {
-            setSelectedPlaceId(data[0].id);
+            setSelectedPlaceId((currentSelected) => {
+              if (currentSelected && data.some((p) => p.id === currentSelected)) {
+                return currentSelected;
+              }
+              return data[0].id;
+            });
           }
         }
       } catch (err) {
@@ -295,7 +346,7 @@ export default function ExplorePage() {
               places={filteredPlaces}
               selectedPlaceId={selectedPlaceId}
               hoveredPlaceId={hoveredPlaceId}
-              onSelectPlace={(placeId) => setSelectedPlaceId(placeId)}
+              onSelectPlace={setSelectedPlaceId}
               className="h-full min-h-[500px] shadow-sm"
             />
           </div>

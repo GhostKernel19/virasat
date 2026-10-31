@@ -10,7 +10,8 @@ export interface FooterProps {
 }
 
 export function Footer({ pageCode, className = "" }: FooterProps) {
-  const pathname = usePathname();
+  const rawPathname = usePathname();
+  const pathname = rawPathname || "";
   const { t } = useLanguage();
 
   let currentPageCode = pageCode;

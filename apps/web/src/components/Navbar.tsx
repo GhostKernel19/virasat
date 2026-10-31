@@ -11,13 +11,14 @@ export interface NavbarProps {
 }
 
 export function Navbar({ savedCount = 3 }: NavbarProps) {
-  const pathname = usePathname();
+  const rawPathname = usePathname();
+  const pathname = rawPathname || "";
   const { language, setLanguage, t } = useLanguage();
 
   const navLinks = [
-    { href: "/explore", label: t.nav.explore, match: (p: string) => p.startsWith("/explore") || p === "/" },
-    { href: "/search", label: t.nav.search, match: (p: string) => p.startsWith("/search") },
-    { href: "/contribute", label: t.nav.contribute, match: (p: string) => p.startsWith("/contribute") },
+    { href: "/explore", label: t.nav.explore, match: (p: string) => Boolean(p && (p.startsWith("/explore") || p === "/")) },
+    { href: "/search", label: t.nav.search, match: (p: string) => Boolean(p && p.startsWith("/search")) },
+    { href: "/contribute", label: t.nav.contribute, match: (p: string) => Boolean(p && p.startsWith("/contribute")) },
   ];
 
   const formattedSavedCount =
