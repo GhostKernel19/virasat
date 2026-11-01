@@ -70,6 +70,30 @@ export interface TranslationDictionary {
       subtitle: string;
       badge: string;
       cta: string;
+      imageLabel: string;
+      imageHint: string;
+      titleLabel: string;
+      titlePlaceholder: string;
+      placeLabel: string;
+      selectPlacePrompt: string;
+      loadingPlaces: string;
+      submitBtn: string;
+      processingBtn: string;
+      pipelineTitle: string;
+      stageOcr: string;
+      stageTranslate: string;
+      stageTag: string;
+      statusPending: string;
+      statusRunning: string;
+      statusDone: string;
+      statusFailed: string;
+      timeoutMessage: string;
+      resultsTitle: string;
+      devanagariHeader: string;
+      translationHeader: string;
+      tagsLabel: string;
+      viewPlace: string;
+      submitAnother: string;
     };
     place: {
       title: string;
@@ -152,6 +176,30 @@ export const en: TranslationDictionary = {
       subtitle: "Submit architectural field notes, family photographs, or undocumented oral histories.",
       badge: "COMMUNITY ARCHIVE",
       cta: "Submit Heritage Record",
+      imageLabel: "Archival Image",
+      imageHint: "Upload a scan or photo of an inscription, stepwell, temple, or fort (JPEG/PNG/WEBP).",
+      titleLabel: "Record Title",
+      titlePlaceholder: "e.g., Devanagari Stone Inscription at Stepwell Entrance",
+      placeLabel: "Associated Heritage Place (Required)",
+      selectPlacePrompt: "-- Select a place (Required) --",
+      loadingPlaces: "Loading places from database...",
+      submitBtn: "Submit Record to Pipeline",
+      processingBtn: "Processing Pipeline...",
+      pipelineTitle: "Pipeline Processing Status",
+      stageOcr: "OCR Transcription (Devanagari)",
+      stageTranslate: "Contextual Translation (English)",
+      stageTag: "Taxonomy & Keyword Tagging",
+      statusPending: "Pending",
+      statusRunning: "Running",
+      statusDone: "Completed",
+      statusFailed: "Failed",
+      timeoutMessage: "Processing timed out after 3 minutes. The pipeline may still be finishing in the background.",
+      resultsTitle: "Processed Heritage Record",
+      devanagariHeader: "Original Devanagari Text",
+      translationHeader: "English Translation",
+      tagsLabel: "Generated Tags",
+      viewPlace: "View place",
+      submitAnother: "Contribute Another Record",
     },
     place: {
       title: "Heritage Asset Record",

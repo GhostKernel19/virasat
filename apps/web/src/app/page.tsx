@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { Navbar, Footer, Badge, Button, PlaceCard } from "@/components";
+import { Navbar, Footer, Badge, Button, PlaceCard, HeroVideo } from "@/components";
 import { useLanguage } from "@/i18n";
 import { ArrowRight, Compass, Search, PlusCircle } from "lucide-react";
 
@@ -13,41 +13,75 @@ export default function HomePage() {
     <div className="min-h-screen flex flex-col bg-sand text-ink">
       <Navbar />
 
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        {/* Top Header Section matching the screenshot */}
-        <div className="mb-8">
-          <p className="text-[11px] font-bold tracking-widest text-terracotta uppercase mb-2">
+      {/* Hero Section */}
+      <section className="relative overflow-hidden isolate w-full bg-[var(--hero-brown-2)] py-20 sm:py-28 lg:py-36 px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center text-center">
+        <HeroVideo />
+
+        {/* Hero Text and CTAs */}
+        <div className="relative z-10 max-w-4xl mx-auto flex flex-col items-center">
+          <p className="text-xs sm:text-sm font-bold tracking-widest text-terracotta uppercase mb-3 hero-text-shadow">
             {t.routes.home.badge}
           </p>
-          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
-            <div className="max-w-2xl">
-              <h1 className="font-serif text-3xl sm:text-4xl lg:text-[42px] font-normal leading-tight text-ink">
-                {t.routes.home.title}
-              </h1>
-              <p className="mt-3 text-sm text-ink/70 max-w-xl">
-                {t.routes.home.subtitle}
-              </p>
-            </div>
+          <h1 className="font-serif text-3xl sm:text-5xl lg:text-6xl font-normal leading-tight text-sand hero-text-shadow">
+            {t.routes.home.title}
+          </h1>
+          <p className="mt-4 sm:mt-5 text-base sm:text-lg text-sand/90 max-w-2xl mx-auto leading-relaxed hero-text-shadow">
+            {t.routes.home.subtitle}
+          </p>
 
-            {/* Quick Metrics from screenshot */}
-            <div className="flex items-center gap-8 self-start lg:self-auto">
-              <div>
-                <span className="font-serif text-3xl sm:text-4xl text-terracotta font-normal block leading-none">
-                  04
-                </span>
-                <span className="text-[11px] text-ink/60 uppercase tracking-wider mt-1 block">
-                  {t.common.placesMapped}
-                </span>
-              </div>
-              <div className="h-8 w-px bg-line" />
-              <div>
-                <span className="font-serif text-3xl sm:text-4xl text-terracotta font-normal block leading-none">
-                  60
-                </span>
-                <span className="text-[11px] text-ink/60 uppercase tracking-wider mt-1 block">
-                  {t.common.linkedRecords}
-                </span>
-              </div>
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+            <Link href="/explore">
+              <Button
+                variant="primary"
+                size="lg"
+                iconRight={<Compass className="w-4 h-4" />}
+              >
+                {t.routes.home.ctaExplore}
+              </Button>
+            </Link>
+            <Link href="/contribute">
+              <Button
+                variant="secondary"
+                size="lg"
+                iconRight={<ArrowRight className="w-4 h-4" />}
+                className="bg-sand/15 hover:bg-sand/25 text-sand border border-sand/30 backdrop-blur-xs shadow-sm"
+              >
+                {t.routes.home.ctaContribute}
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <main className="relative z-10 flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        {/* Quick Metrics & Collection Overview */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-line pb-6 mb-8">
+          <div>
+            <h2 className="font-serif text-2xl font-normal text-ink">
+              {t.common.placesInCollection}
+            </h2>
+            <p className="text-xs sm:text-sm text-ink/65 mt-1">
+              {t.brand.sublabel}
+            </p>
+          </div>
+
+          <div className="flex items-center gap-8 self-start sm:self-auto">
+            <div>
+              <span className="font-serif text-3xl sm:text-4xl text-terracotta font-normal block leading-none">
+                04
+              </span>
+              <span className="text-[11px] text-ink/60 uppercase tracking-wider mt-1 block">
+                {t.common.placesMapped}
+              </span>
+            </div>
+            <div className="h-8 w-px bg-line" />
+            <div>
+              <span className="font-serif text-3xl sm:text-4xl text-terracotta font-normal block leading-none">
+                60
+              </span>
+              <span className="text-[11px] text-ink/60 uppercase tracking-wider mt-1 block">
+                {t.common.linkedRecords}
+              </span>
             </div>
           </div>
         </div>

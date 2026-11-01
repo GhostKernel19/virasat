@@ -161,7 +161,7 @@ export function FallingLeaves() {
     <div
       ref={containerRef}
       aria-hidden="true"
-      className="fixed inset-0 pointer-events-none z-0 overflow-hidden select-none"
+      className="fixed inset-0 pointer-events-none z-[2] overflow-hidden select-none"
     >
       {LEAVES_CONFIG.map((config) => (
         <div
