@@ -1,19 +1,33 @@
+import io
 import os
 import re
+import sys
+import time
 import uuid
-import base64
 import logging
+import traceback
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional, List, Dict, Any
 
 import httpx
+from PIL import Image
+from contextlib import asynccontextmanager
 from dotenv import load_dotenv
 from fastapi import FastAPI, UploadFile, File, Form, HTTPException, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from google import genai
+from google.genai import types
 from supabase import create_client, Client
 
 from json_parser import parse_json_from_response
+
+# Ensure UTF-8 stdout on Windows
+if hasattr(sys.stdout, "reconfigure"):
+    try:
+        sys.stdout.reconfigure(encoding="utf-8")
+    except Exception:
+        pass
 
 # -----------------------------------------------------------------------------
 # Logging configuration
@@ -31,19 +45,35 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 SUPABASE_URL = os.getenv("SUPABASE_URL", "")
 SUPABASE_SERVICE_ROLE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY", "")
 
+# Print whether environment variables are loaded (only true or false, never values)
+print(f"GEMINI_API_KEY loaded: {bool(GEMINI_API_KEY)}")
+print(f"SUPABASE_URL loaded: {bool(SUPABASE_URL)}")
+print(f"SUPABASE_SERVICE_ROLE_KEY loaded: {bool(SUPABASE_SERVICE_ROLE_KEY)}")
+
 if not SUPABASE_URL or not SUPABASE_SERVICE_ROLE_KEY:
     logger.warning("SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY is missing in environment.")
 
 # Initialize Supabase client with service role key
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
 
+
 # -----------------------------------------------------------------------------
-# FastAPI App & CORS Setup
+# FastAPI App Lifecycle & CORS Setup
 # -----------------------------------------------------------------------------
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Print whether keys are loaded on app startup
+    print(f"GEMINI_API_KEY loaded: {bool(GEMINI_API_KEY)}")
+    print(f"SUPABASE_URL loaded: {bool(SUPABASE_URL)}")
+    print(f"SUPABASE_SERVICE_ROLE_KEY loaded: {bool(SUPABASE_SERVICE_ROLE_KEY)}")
+    yield
+
+
 app = FastAPI(
     title="Virasat Heritage API",
     description="Backend API for Virasat Cultural Heritage Atlas",
-    version="1.0.0"
+    version="1.0.0",
+    lifespan=lifespan
 )
 
 # Enable CORS for http://localhost:3000
@@ -54,6 +84,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 # -----------------------------------------------------------------------------
 # DB Mapping Helpers (Handling PostgreSQL Check Constraints Gracefully)
@@ -100,7 +131,6 @@ def normalize_job_row(row: Dict[str, Any]) -> Dict[str, Any]:
 
 def insert_processing_job(item_id: str, stage: str, status: str, error: Optional[str] = None) -> Dict[str, Any]:
     """Insert a processing job, falling back to DB enum values if check constraints are enforced."""
-    # Attempt with requested values first
     try:
         res = supabase.table("processing_jobs").insert({
             "item_id": item_id,
@@ -126,80 +156,150 @@ def insert_processing_job(item_id: str, stage: str, status: str, error: Optional
     return res.data[0] if res.data else {}
 
 
-def update_processing_job(job_id: str, status: str, error: Optional[str] = None) -> None:
-    """Update a processing job status and error."""
+def update_processing_job(
+    job_id: str,
+    status: str,
+    error: Optional[str] = None,
+    started_at: Optional[str] = None,
+    finished_at: Optional[str] = None
+) -> None:
+    """Update a processing job status, error, started_at, and finished_at timestamps."""
+    update_data: Dict[str, Any] = {
+        "status": status,
+        "error": error
+    }
+    if started_at is not None:
+        update_data["started_at"] = started_at
+    if finished_at is not None:
+        update_data["finished_at"] = finished_at
+
     try:
-        supabase.table("processing_jobs").update({
-            "status": status,
-            "error": error
-        }).eq("id", job_id).execute()
+        supabase.table("processing_jobs").update(update_data).eq("id", job_id).execute()
         return
     except Exception as e:
         logger.debug(f"Direct job update ({status}) error: {e}")
 
     # Fallback to DB status enum
     fallback_status = STATUS_MAP_TO_DB.get(status, status)
-    supabase.table("processing_jobs").update({
-        "status": fallback_status,
-        "error": error
-    }).eq("id", job_id).execute()
+    update_data["status"] = fallback_status
+    supabase.table("processing_jobs").update(update_data).eq("id", job_id).execute()
 
 
 # -----------------------------------------------------------------------------
-# Gemini Calling Helpers
+# Image Processing Helper (Pillow)
+# -----------------------------------------------------------------------------
+def downscale_image(image_bytes: bytes, max_side: int = 1600, quality: int = 85) -> tuple[bytes, str]:
+    """
+    Downscale the image before sending to Gemini:
+      - Max side (width or height) 1600px
+      - JPEG quality 85
+    Returns (downscaled_bytes, "image/jpeg").
+    """
+    try:
+        with Image.open(io.BytesIO(image_bytes)) as img:
+            if img.mode != "RGB":
+                img = img.convert("RGB")
+            width, height = img.size
+            if max(width, height) > max_side:
+                img.thumbnail((max_side, max_side), Image.Resampling.LANCZOS)
+            out_buf = io.BytesIO()
+            img.save(out_buf, format="JPEG", quality=quality, optimize=True)
+            return out_buf.getvalue(), "image/jpeg"
+    except Exception as e:
+        logger.warning(f"Image downscaling failed, falling back to original bytes: {e}")
+        return image_bytes, "image/jpeg"
+
+
+# -----------------------------------------------------------------------------
+# Gemini Calling Helpers (using official google-genai SDK)
 # -----------------------------------------------------------------------------
 GEMINI_PREFERRED_MODELS = [
     "gemini-2.5-flash",
     "gemini-3.8-flash",
+    "gemini-3.5-flash",
     "gemini-flash-latest"
 ]
 
 
-def call_gemini_api(contents: List[Dict[str, Any]], system_prompt: Optional[str] = None) -> tuple[str, str]:
+def call_gemini_api(
+    prompt: str,
+    image_bytes: Optional[bytes] = None,
+    mime_type: Optional[str] = None,
+    thinking_budget: Optional[int] = None
+) -> tuple[str, str]:
     """
-    Call Gemini API with automatic model fallback if a specific model is deprecated or unavailable.
+    Call Gemini API using official google-genai client with:
+      - 60 second timeout
+      - Retry up to 3 times on 429/503 with 5s and 15s backoff, logging with timestamp
+      - Optional thinking_budget (0 to disable thinking)
+      - Automatic model fallback sequence starting with gemini-2.5-flash
     Returns (response_text, model_name).
     """
     if not GEMINI_API_KEY:
         raise ValueError("GEMINI_API_KEY is not configured.")
 
-    headers = {"Content-Type": "application/json"}
-    payload: Dict[str, Any] = {"contents": contents}
-    if system_prompt:
-        payload["systemInstruction"] = {
-            "parts": [{"text": system_prompt}]
-        }
+    # Configure 60 second timeout (60,000 milliseconds)
+    client = genai.Client(
+        api_key=GEMINI_API_KEY,
+        http_options=types.HttpOptions(timeout=60000)
+    )
 
+    contents: List[Any] = []
+    if image_bytes and mime_type:
+        part = types.Part.from_bytes(data=image_bytes, mime_type=mime_type)
+        contents.append(part)
+    contents.append(prompt)
+
+    config_kwargs: Dict[str, Any] = {}
+    if thinking_budget is not None:
+        config_kwargs["thinking_config"] = types.ThinkingConfig(thinking_budget=thinking_budget)
+
+    gen_config = types.GenerateContentConfig(**config_kwargs) if config_kwargs else None
+
+    retry_delays = [5, 15, 15]
     last_error: Optional[Exception] = None
 
     for model in GEMINI_PREFERRED_MODELS:
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={GEMINI_API_KEY}"
-        try:
-            with httpx.Client(timeout=45.0) as client:
-                response = client.post(url, json=payload, headers=headers)
-                if response.status_code == 200:
-                    data = response.json()
-                    candidates = data.get("candidates", [])
-                    if candidates and "content" in candidates[0]:
-                        parts = candidates[0]["content"].get("parts", [])
-                        text = "".join(part.get("text", "") for part in parts)
+        # Retry up to 3 times on 429/503 for the model
+        for attempt in range(1, 4):
+            try:
+                logger.info(f"Calling Gemini API with model: {model} (attempt {attempt}/3)")
+                response = client.models.generate_content(
+                    model=model,
+                    contents=contents,
+                    config=gen_config
+                )
+                if response and response.text:
+                    return response.text, model
+                elif response and response.candidates:
+                    candidate = response.candidates[0]
+                    if candidate.content and candidate.content.parts:
+                        text = "".join(part.text or "" for part in candidate.content.parts)
                         return text, model
-                    raise ValueError(f"Empty candidate content in Gemini response: {data}")
-                elif response.status_code in (404, 503):
-                    # Model not available or high demand; attempt next model in list
-                    logger.warning(f"Gemini model {model} returned {response.status_code}: {response.text[:200]}")
-                    last_error = RuntimeError(f"Model {model} returned {response.status_code}: {response.text[:200]}")
+                raise ValueError(f"Empty text received from model {model}")
+
+            except Exception as exc:
+                last_error = exc
+                err_str = str(exc)
+                code = getattr(exc, "code", None)
+                is_retryable = (code in (429, 503)) or any(
+                    term in err_str.upper() for term in ["429", "503", "RESOURCE_EXHAUSTED", "UNAVAILABLE"]
+                )
+
+                if is_retryable and attempt < 3:
+                    delay = retry_delays[attempt - 1]
+                    now_iso = datetime.now(timezone.utc).isoformat()
+                    retry_log = (
+                        f"[{now_iso}] Gemini API returned status {code or '429/503'} "
+                        f"on model {model}: {err_str[:200]}. Retrying in {delay}s (attempt {attempt}/3)..."
+                    )
+                    print(retry_log)
+                    logger.warning(retry_log)
+                    time.sleep(delay)
                     continue
-                else:
-                    raise RuntimeError(f"Gemini API returned status {response.status_code}: {response.text[:300]}")
-        except httpx.TimeoutException as exc:
-            logger.warning(f"Gemini request timeout on model {model}: {exc}")
-            last_error = exc
-            continue
-        except Exception as exc:
-            logger.warning(f"Error calling model {model}: {exc}")
-            last_error = exc
-            continue
+
+                logger.warning(f"Gemini model {model} attempt {attempt} failed: {err_str[:250]}")
+                break
 
     if last_error:
         raise last_error
@@ -219,47 +319,49 @@ def run_processing_pipeline(
 ):
     """
     Executes the 4-stage heritage archive processing pipeline:
-      Stage 1: ocr (Gemini Devanagari line extraction)
+      Stage 1: ocr (Gemini Devanagari line extraction with downscaled image, thinking_budget=0, compact JSON)
       Stage 2: translate (Gemini translation to English)
       Stage 3: tag (Keyword rules for tags & item_tags)
       Stage 4: finish (Update item status to 'needs_review')
+
+    Wrapped in try/except to print full traceback, mark failed stage with error, and set item to 'failed'.
+    Logs duration of each stage to terminal.
     """
-    logger.info(f"Starting processing pipeline for item_id={item_id}")
-
-    # -------------------------------------------------------------------------
-    # Stage 1: OCR
-    # -------------------------------------------------------------------------
-    ocr_job_id = job_ids["ocr"]
-    update_processing_job(ocr_job_id, "running")
-
-    ocr_lines: List[Dict[str, Any]] = []
-    ocr_id: Optional[str] = None
-    original_text: str = ""
-
+    current_stage = "ocr"
+    stage_start = time.perf_counter()
     try:
-        b64_img = base64.b64encode(image_bytes).decode("utf-8")
+        logger.info(f"Starting processing pipeline for item_id={item_id}")
+
+        # ---------------------------------------------------------------------
+        # Stage 1: OCR
+        # ---------------------------------------------------------------------
+        current_stage = "ocr"
+        stage_start = time.perf_counter()
+        ocr_job_id = job_ids.get("ocr")
+        started_at = datetime.now(timezone.utc).isoformat()
+        if ocr_job_id:
+            update_processing_job(ocr_job_id, status="running", started_at=started_at)
+
+        # 1) Downscale image before sending to Gemini (max side 1600px, JPEG quality 85)
+        ocr_image_bytes, ocr_mime_type = downscale_image(image_bytes, max_side=1600, quality=85)
+
+        ocr_lines: List[Dict[str, Any]] = []
+        ocr_id: Optional[str] = None
+        original_text: str = ""
+
+        # 3) Use gemini-2.5-flash with thinking_budget 0 for OCR and compact JSON only
         ocr_prompt = (
-            "You are an expert heritage epigraphy and manuscript transcription engine. "
-            "Examine this archival image and transcribe all Devanagari text (Marathi / Sanskrit / Hindi). "
-            "Return a strict JSON array of objects, where each object represents an extracted line with 'text' (string) "
-            "and 'confidence' (float between 0.0 and 1.0). "
-            "Example format: [{\"text\": \"...\", \"confidence\": 0.98}]. "
-            "Return ONLY the JSON array (or JSON wrapped in markdown code fence)."
+            "Transcribe all Devanagari text (Marathi / Sanskrit / Hindi) from this archival image. "
+            "Return compact JSON only: [{\"text\":\"...\",\"confidence\":0.95}]. "
+            "No explanation, no formatting outside the JSON array."
         )
 
-        contents = [{
-            "parts": [
-                {"text": ocr_prompt},
-                {
-                    "inline_data": {
-                        "mime_type": mime_type,
-                        "data": b64_img
-                    }
-                }
-            ]
-        }]
-
-        gemini_ocr_raw, _ = call_gemini_api(contents)
+        gemini_ocr_raw, used_ocr_model = call_gemini_api(
+            prompt=ocr_prompt,
+            image_bytes=ocr_image_bytes,
+            mime_type=ocr_mime_type,
+            thinking_budget=0
+        )
         parsed_data = parse_json_from_response(gemini_ocr_raw)
 
         if isinstance(parsed_data, list):
@@ -269,7 +371,6 @@ def run_processing_pipeline(
         else:
             raise ValueError(f"Unexpected JSON structure from OCR: {parsed_data}")
 
-        # Ensure text and confidence format
         cleaned_lines = []
         for line in ocr_lines:
             if isinstance(line, dict) and "text" in line:
@@ -281,7 +382,6 @@ def run_processing_pipeline(
         ocr_lines = cleaned_lines
 
         if not ocr_lines:
-            # Fallback if no lines were detected in the image
             ocr_lines = [{"text": item_title, "confidence": 0.90}]
 
         avg_conf = round(sum(l["confidence"] for l in ocr_lines) / len(ocr_lines), 4)
@@ -299,24 +399,25 @@ def run_processing_pipeline(
         if ocr_insert_res.data:
             ocr_id = ocr_insert_res.data[0]["id"]
 
-        update_processing_job(ocr_job_id, "done")
-        logger.info(f"Stage 1 (OCR) completed for item_id={item_id}, ocr_id={ocr_id}")
-    except Exception as exc:
-        err_msg = f"OCR Stage failed: {str(exc)}"
-        logger.error(err_msg, exc_info=True)
-        update_processing_job(ocr_job_id, "failed", err_msg)
-        return
+        finished_at = datetime.now(timezone.utc).isoformat()
+        if ocr_job_id:
+            update_processing_job(ocr_job_id, status="done", finished_at=finished_at)
 
-    # -------------------------------------------------------------------------
-    # Stage 2: Translate
-    # -------------------------------------------------------------------------
-    translate_job_id = job_ids["translate"]
-    update_processing_job(translate_job_id, "running")
+        # 4) Log the duration of stage to the terminal
+        stage_duration = time.perf_counter() - stage_start
+        print(f"[{finished_at}] Stage 'ocr' completed in {stage_duration:.2f}s (model={used_ocr_model})")
+        logger.info(f"Stage 'ocr' completed in {stage_duration:.2f}s (model={used_ocr_model})")
 
-    translated_text: str = ""
-    used_model: str = "gemini-2.5-flash"
+        # ---------------------------------------------------------------------
+        # Stage 2: Translate
+        # ---------------------------------------------------------------------
+        current_stage = "translate"
+        stage_start = time.perf_counter()
+        translate_job_id = job_ids.get("translate")
+        started_at = datetime.now(timezone.utc).isoformat()
+        if translate_job_id:
+            update_processing_job(translate_job_id, status="running", started_at=started_at)
 
-    try:
         translate_prompt = (
             "Translate the following historical Devanagari / Marathi text lines into clear English. "
             "Maintain cultural and architectural context accurately.\n\n"
@@ -324,37 +425,39 @@ def run_processing_pipeline(
             "Provide the English translation as plain text."
         )
 
-        contents = [{"parts": [{"text": translate_prompt}]}]
-        raw_translation, used_model = call_gemini_api(contents)
-        translated_text = raw_translation.strip()
+        translated_text, used_trans_model = call_gemini_api(prompt=translate_prompt)
+        translated_text = translated_text.strip()
 
         if ocr_id:
             supabase.table("translations").insert({
                 "ocr_id": ocr_id,
                 "language": "en",
                 "text": translated_text,
-                "model": used_model,
+                "model": used_trans_model,
                 "is_illustrative": False
             }).execute()
 
-        update_processing_job(translate_job_id, "done")
-        logger.info(f"Stage 2 (Translate) completed for item_id={item_id}")
-    except Exception as exc:
-        err_msg = f"Translation Stage failed: {str(exc)}"
-        logger.error(err_msg, exc_info=True)
-        update_processing_job(translate_job_id, "failed", err_msg)
-        return
+        finished_at = datetime.now(timezone.utc).isoformat()
+        if translate_job_id:
+            update_processing_job(translate_job_id, status="done", finished_at=finished_at)
 
-    # -------------------------------------------------------------------------
-    # Stage 3: Tag
-    # -------------------------------------------------------------------------
-    tag_job_id = job_ids["tag"]
-    update_processing_job(tag_job_id, "running")
+        # 4) Log the duration of stage to the terminal
+        stage_duration = time.perf_counter() - stage_start
+        print(f"[{finished_at}] Stage 'translate' completed in {stage_duration:.2f}s (model={used_trans_model})")
+        logger.info(f"Stage 'translate' completed in {stage_duration:.2f}s (model={used_trans_model})")
 
-    try:
+        # ---------------------------------------------------------------------
+        # Stage 3: Tag
+        # ---------------------------------------------------------------------
+        current_stage = "tag"
+        stage_start = time.perf_counter()
+        tag_job_id = job_ids.get("tag")
+        started_at = datetime.now(timezone.utc).isoformat()
+        if tag_job_id:
+            update_processing_job(tag_job_id, status="running", started_at=started_at)
+
         combined_text = f"{item_title} {original_text} {translated_text}".lower()
 
-        # Keyword rules matching specified keywords
         keyword_patterns = {
             "stepwell": [r"\bstepwell\b", r"\bvav\b", r"\bbaoli\b", r"पायविहीर", r"वाव", r"बावडी"],
             "fort": [r"\bfort\b", r"\bfortress\b", r"किल्ला", r"दुर्ग", r"गड"],
@@ -369,12 +472,10 @@ def run_processing_pipeline(
                     matched_tags.append(tag_name)
                     break
 
-        # Fallback to inscription tag if none matched
         if not matched_tags:
             matched_tags.append("inscription")
 
         for tag_name in matched_tags:
-            # Query or insert tag
             tag_query = supabase.table("tags").select("id").eq("name", tag_name).execute()
             tag_id: Optional[str] = None
             if tag_query.data:
@@ -391,25 +492,27 @@ def run_processing_pipeline(
                         "tag_id": tag_id
                     }).execute()
                 except Exception:
-                    # Ignore duplicate item_tags primary key constraint
                     pass
 
-        update_processing_job(tag_job_id, "done")
-        logger.info(f"Stage 3 (Tag) completed for item_id={item_id}, tags={matched_tags}")
-    except Exception as exc:
-        err_msg = f"Tagging Stage failed: {str(exc)}"
-        logger.error(err_msg, exc_info=True)
-        update_processing_job(tag_job_id, "failed", err_msg)
-        return
+        finished_at = datetime.now(timezone.utc).isoformat()
+        if tag_job_id:
+            update_processing_job(tag_job_id, status="done", finished_at=finished_at)
 
-    # -------------------------------------------------------------------------
-    # Stage 4: Finish
-    # -------------------------------------------------------------------------
-    finish_job_id = job_ids["finish"]
-    update_processing_job(finish_job_id, "running")
+        # 4) Log the duration of stage to the terminal
+        stage_duration = time.perf_counter() - stage_start
+        print(f"[{finished_at}] Stage 'tag' completed in {stage_duration:.2f}s (tags={matched_tags})")
+        logger.info(f"Stage 'tag' completed in {stage_duration:.2f}s (tags={matched_tags})")
 
-    try:
-        # Set item status to 'needs_review' (with fallback to 'in_review' if check constraint enforces schema.sql)
+        # ---------------------------------------------------------------------
+        # Stage 4: Finish
+        # ---------------------------------------------------------------------
+        current_stage = "finish"
+        stage_start = time.perf_counter()
+        finish_job_id = job_ids.get("finish")
+        started_at = datetime.now(timezone.utc).isoformat()
+        if finish_job_id:
+            update_processing_job(finish_job_id, status="running", started_at=started_at)
+
         try:
             supabase.table("heritage_items").update({
                 "status": "needs_review"
@@ -419,13 +522,41 @@ def run_processing_pipeline(
                 "status": "in_review"
             }).eq("id", item_id).execute()
 
-        update_processing_job(finish_job_id, "done")
-        logger.info(f"Stage 4 (Finish) completed for item_id={item_id}")
+        finished_at = datetime.now(timezone.utc).isoformat()
+        if finish_job_id:
+            update_processing_job(finish_job_id, status="done", finished_at=finished_at)
+
+        # 4) Log the duration of stage to the terminal
+        stage_duration = time.perf_counter() - stage_start
+        print(f"[{finished_at}] Stage 'finish' completed in {stage_duration:.2f}s")
+        logger.info(f"Stage 'finish' completed in {stage_duration:.2f}s")
+
     except Exception as exc:
-        err_msg = f"Finish Stage failed: {str(exc)}"
-        logger.error(err_msg, exc_info=True)
-        update_processing_job(finish_job_id, "failed", err_msg)
-        return
+        traceback.print_exc()
+        stage_duration = time.perf_counter() - stage_start
+        err_msg = str(exc)
+        now_iso = datetime.now(timezone.utc).isoformat()
+        print(f"[{now_iso}] Stage '{current_stage}' FAILED after {stage_duration:.2f}s: {err_msg}")
+        logger.error(f"Pipeline failed at stage '{current_stage}' after {stage_duration:.2f}s: {err_msg}", exc_info=True)
+
+        failed_job_id = job_ids.get(current_stage)
+        finished_at = now_iso
+        if failed_job_id:
+            update_processing_job(
+                failed_job_id,
+                status="failed",
+                error=err_msg,
+                finished_at=finished_at
+            )
+
+        try:
+            supabase.table("heritage_items").update({"status": "failed"}).eq("id", item_id).execute()
+        except Exception as update_err:
+            logger.debug(f"Direct update item status to failed error: {update_err}")
+            try:
+                supabase.table("heritage_items").update({"status": "draft"}).eq("id", item_id).execute()
+            except Exception:
+                pass
 
 
 # -----------------------------------------------------------------------------
@@ -446,10 +577,11 @@ async def create_item(
     background_tasks: BackgroundTasks,
     image: UploadFile = File(...),
     title: str = Form(...),
-    place_id: Optional[str] = Form(None)
+    place_id: str = Form(...)
 ):
     """
-    POST /items (multipart: image file, title, optional place_id):
+    POST /items (multipart: image file, title, place_id):
+      - Requires a valid place_id (returns 400 if missing or invalid).
       - Uploads image to public Supabase Storage bucket 'uploads'.
       - Creates heritage_items row with status 'processing'.
       - Creates media row with public URL.
@@ -458,6 +590,27 @@ async def create_item(
     """
     if not image.filename:
         raise HTTPException(status_code=400, detail="An image file is required.")
+
+    if not title or not title.strip():
+        raise HTTPException(status_code=400, detail="A title is required.")
+
+    # 5) POST /items must require a valid place_id and return 400 otherwise (remove default Rani ki Vav id)
+    if not place_id or not place_id.strip():
+        raise HTTPException(status_code=400, detail="A valid place_id is required.")
+
+    clean_place_id = place_id.strip()
+    try:
+        place_check = supabase.table("places").select("id").eq("id", clean_place_id).execute()
+        if not place_check.data or len(place_check.data) == 0:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Invalid place_id '{clean_place_id}': No matching place found in database."
+            )
+    except HTTPException:
+        raise
+    except Exception as exc:
+        logger.error(f"Error verifying place_id '{clean_place_id}': {exc}")
+        raise HTTPException(status_code=400, detail=f"Invalid place_id '{clean_place_id}'.")
 
     # 1. Read file bytes
     file_bytes = await image.read()
@@ -481,19 +634,10 @@ async def create_item(
 
     public_url = supabase.storage.from_("uploads").get_public_url(unique_filename)
 
-    # 3. Resolve place_id if optional/not provided
-    resolved_place_id = place_id
-    if not resolved_place_id:
-        places_res = supabase.table("places").select("id").limit(1).execute()
-        if places_res.data:
-            resolved_place_id = places_res.data[0]["id"]
-        else:
-            raise HTTPException(status_code=400, detail="No places exist in database to anchor item.")
-
-    # 4. Create heritage_items row with status 'processing'
+    # 3. Create heritage_items row with status 'processing'
     item_row = {
-        "place_id": resolved_place_id,
-        "title": title,
+        "place_id": clean_place_id,
+        "title": title.strip(),
         "status": "processing",
         "language": "en",
         "is_illustrative": False
@@ -545,10 +689,114 @@ async def create_item(
 
     return {
         "id": item_id,
-        "title": title,
+        "title": title.strip(),
         "status": "processing",
-        "place_id": resolved_place_id,
+        "place_id": clean_place_id,
         "media_url": public_url
+    }
+
+
+@app.post("/items/{id}/retry", status_code=200)
+async def retry_item(
+    id: str,
+    background_tasks: BackgroundTasks
+):
+    """
+    POST /items/{id}/retry:
+      - Validates that the heritage item exists.
+      - Retrieves its associated media asset and binary data.
+      - Resets or re-creates the 4 processing_jobs rows with status 'pending' (clearing errors and timestamps).
+      - Resets heritage_items status to 'processing' (or 'draft').
+      - Re-runs the background processing pipeline.
+      - Returns status and job details.
+    """
+    # 1. Fetch heritage item
+    item_res = supabase.table("heritage_items").select("*").eq("id", id).execute()
+    if not item_res.data:
+        raise HTTPException(status_code=404, detail="Heritage item not found.")
+
+    item = item_res.data[0]
+
+    # 2. Fetch media record
+    media_res = supabase.table("media").select("*").eq("item_id", id).order("created_at").limit(1).execute()
+    if not media_res.data:
+        raise HTTPException(status_code=404, detail="No media found for heritage item.")
+
+    media = media_res.data[0]
+    media_id = media["id"]
+    media_url = media["url"]
+    mime_type = media.get("mime_type") or "image/jpeg"
+
+    # 3. Retrieve image bytes from URL or storage
+    image_bytes: Optional[bytes] = None
+    try:
+        with httpx.Client(timeout=30.0) as http_client:
+            resp = http_client.get(media_url)
+            if resp.status_code == 200:
+                image_bytes = resp.content
+    except Exception as e:
+        logger.warning(f"HTTP fetch of media_url failed: {e}")
+
+    if not image_bytes:
+        try:
+            filename = media_url.split("/")[-1].split("?")[0]
+            image_bytes = supabase.storage.from_("uploads").download(filename)
+        except Exception as e:
+            logger.error(f"Storage download failed: {e}")
+            raise HTTPException(status_code=500, detail=f"Failed to retrieve media file for retry: {str(e)}")
+
+    # 4. Reset heritage item status to 'processing'
+    try:
+        supabase.table("heritage_items").update({"status": "processing"}).eq("id", id).execute()
+    except Exception:
+        supabase.table("heritage_items").update({"status": "draft"}).eq("id", id).execute()
+
+    # 5. Initialize or reset processing_jobs rows to 'pending'
+    job_ids: Dict[str, str] = {}
+    for stage_name in ["ocr", "translate", "tag", "finish"]:
+        db_stage = STAGE_MAP_TO_DB.get(stage_name, stage_name)
+        existing = (
+            supabase.table("processing_jobs")
+            .select("id")
+            .eq("item_id", id)
+            .in_("stage", [stage_name, db_stage])
+            .execute()
+        )
+
+        if existing.data:
+            job_id = existing.data[0]["id"]
+            # Reset existing job to pending, clearing error and timestamps
+            try:
+                supabase.table("processing_jobs").update({
+                    "status": "pending",
+                    "error": None,
+                    "started_at": None,
+                    "finished_at": None
+                }).eq("id", job_id).execute()
+            except Exception:
+                pass
+            job_ids[stage_name] = job_id
+        else:
+            new_job = insert_processing_job(id, stage_name, "pending")
+            if new_job and "id" in new_job:
+                job_ids[stage_name] = new_job["id"]
+
+    # 6. Spawn background pipeline
+    background_tasks.add_task(
+        run_processing_pipeline,
+        item_id=id,
+        media_id=media_id,
+        image_bytes=image_bytes,
+        mime_type=mime_type,
+        item_title=item.get("title", ""),
+        job_ids=job_ids
+    )
+
+    return {
+        "id": id,
+        "status": "processing",
+        "message": "Retry background pipeline started successfully.",
+        "job_ids": job_ids
     }
 
 
@@ -572,6 +820,13 @@ def get_item(id: str):
         raise HTTPException(status_code=404, detail="Heritage item not found.")
 
     item = item_res.data[0]
+
+    # Check if any processing job failed; if so, reflect status 'failed'
+    jobs_res = supabase.table("processing_jobs").select("status").eq("item_id", id).execute()
+    if jobs_res.data:
+        job_statuses = [j.get("status") for j in jobs_res.data]
+        if "failed" in job_statuses:
+            item["status"] = "failed"
 
     # Fetch media associated with item
     media_res = supabase.table("media").select("*").eq("item_id", id).execute()
@@ -607,4 +862,3 @@ def get_item(id: str):
     item["tags"] = tags
 
     return item
-
