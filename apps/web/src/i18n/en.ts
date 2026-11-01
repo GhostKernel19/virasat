@@ -64,6 +64,16 @@ export interface TranslationDictionary {
       subtitle: string;
       badge: string;
       placeholder: string;
+      placesTitle: string;
+      passagesTitle: string;
+      noResults: string;
+      noResultsSubtitle: string;
+      loading: string;
+      allTypes: string;
+      typeFilterLabel: string;
+      viewPlace: string;
+      matchedIn: string;
+      initialPrompt: string;
     };
     contribute: {
       title: string;
@@ -170,6 +180,16 @@ export const en: TranslationDictionary = {
       subtitle: "Search verified inscriptions, survey reports, oral histories, and architectural sites.",
       badge: "ARCHIVE QUERY",
       placeholder: "Search monuments, dynasties, inscriptions, or regions...",
+      placesTitle: "Places",
+      passagesTitle: "Passages & Inscriptions",
+      noResults: "No results found",
+      noResultsSubtitle: "Try adjusting your keywords or clearing the type filter.",
+      loading: "Searching archival records and monuments...",
+      allTypes: "All Types",
+      typeFilterLabel: "Filter by type:",
+      viewPlace: "View Place",
+      matchedIn: "Matched in",
+      initialPrompt: "Enter a query above to search across monument summaries, Devanagari inscriptions, and translations.",
     },
     contribute: {
       title: "Add to the Living Heritage Atlas",

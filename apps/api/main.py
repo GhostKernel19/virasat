@@ -862,3 +862,161 @@ def get_item(id: str):
     item["tags"] = tags
 
     return item
+
+
+@app.get("/search")
+def search(
+    q: Optional[str] = None,
+    type: Optional[str] = None,
+    state: Optional[str] = None
+):
+    """
+    GET /search?q=&type=&state=
+    Searches case-insensitively (ilike) across:
+      - places.name, places.summary, places.state
+      - ocr_texts.original_text
+      - translations.text
+    Returns:
+      {
+        "places": [{id, name, state, period, type, summary}],
+        "passages": [{ocr_id, place_id, place_name, item_title, original_text, translation_text, matched_field}]
+      }
+    Returns an empty result for an empty q, and limits each group to 20.
+    """
+    if not q or not q.strip():
+        return {"places": [], "passages": []}
+
+    query_str = q.strip()
+    safe_q = query_str.replace(",", " ").replace("%", "").strip()
+    if not safe_q:
+        return {"places": [], "passages": []}
+
+    type_filter = type.strip() if type and type.strip() else None
+    state_filter = state.strip() if state and state.strip() else None
+
+    # Helper retry runner for Supabase queries
+    def run_query(builder, retries=3):
+        for attempt in range(retries):
+            try:
+                return builder.execute()
+            except Exception as e:
+                if attempt == retries - 1:
+                    logger.warning(f"Search query error: {e}")
+                    return None
+                time.sleep(0.3 * (attempt + 1))
+        return None
+
+    # 1. Search places across name, summary, state
+    places_builder = (
+        supabase.table("places")
+        .select("id, name, state, period, type, summary")
+        .or_(f"name.ilike.%{safe_q}%,summary.ilike.%{safe_q}%,state.ilike.%{safe_q}%")
+    )
+    if type_filter:
+        places_builder = places_builder.ilike("type", f"%{type_filter}%")
+    if state_filter:
+        places_builder = places_builder.ilike("state", f"%{state_filter}%")
+
+    places_res = run_query(places_builder.limit(20))
+    places_rows = places_res.data if places_res and places_res.data else []
+
+    formatted_places = [
+        {
+            "id": str(p.get("id")),
+            "name": p.get("name") or "",
+            "state": p.get("state") or "",
+            "period": p.get("period") or "",
+            "type": p.get("type") or "",
+            "summary": p.get("summary") or ""
+        }
+        for p in places_rows[:20]
+    ]
+
+    # 2. Search passages (ocr_texts and translations)
+    passages_dict: Dict[str, Dict[str, Any]] = {}
+
+    # 2a. Search ocr_texts.original_text
+    ocr_builder = (
+        supabase.table("ocr_texts")
+        .select("id, original_text, media(heritage_items(id, title, places(id, name, type, state))), translations(id, text)")
+        .ilike("original_text", f"%{safe_q}%")
+    )
+    ocr_res = run_query(ocr_builder.limit(40))
+    if ocr_res and ocr_res.data:
+        for row in ocr_res.data:
+            ocr_id = str(row.get("id") or "")
+            if not ocr_id:
+                continue
+
+            media = row.get("media") or {}
+            item = media.get("heritage_items") or {}
+            place = item.get("places") or {}
+
+            p_type = place.get("type") or ""
+            p_state = place.get("state") or ""
+
+            if type_filter and type_filter.lower() not in p_type.lower():
+                continue
+            if state_filter and state_filter.lower() not in p_state.lower():
+                continue
+
+            translations = row.get("translations") or []
+            trans_text = translations[0].get("text", "") if translations else ""
+
+            passages_dict[ocr_id] = {
+                "ocr_id": ocr_id,
+                "place_id": str(place.get("id") or ""),
+                "place_name": place.get("name") or "",
+                "item_title": item.get("title") or "",
+                "original_text": row.get("original_text") or "",
+                "translation_text": trans_text,
+                "matched_field": "original_text"
+            }
+
+    # 2b. Search translations.text
+    trans_builder = (
+        supabase.table("translations")
+        .select("id, text, ocr_id, ocr_texts(id, original_text, media(heritage_items(id, title, places(id, name, type, state)))))")
+        .ilike("text", f"%{safe_q}%")
+    )
+    trans_res = run_query(trans_builder.limit(40))
+    if trans_res and trans_res.data:
+        for row in trans_res.data:
+            ocr = row.get("ocr_texts") or {}
+            ocr_id = str(row.get("ocr_id") or ocr.get("id") or "")
+            if not ocr_id:
+                continue
+
+            media = ocr.get("media") or {}
+            item = media.get("heritage_items") or {}
+            place = item.get("places") or {}
+
+            p_type = place.get("type") or ""
+            p_state = place.get("state") or ""
+
+            if type_filter and type_filter.lower() not in p_type.lower():
+                continue
+            if state_filter and state_filter.lower() not in p_state.lower():
+                continue
+
+            if ocr_id in passages_dict:
+                if not passages_dict[ocr_id]["translation_text"]:
+                    passages_dict[ocr_id]["translation_text"] = row.get("text") or ""
+            else:
+                passages_dict[ocr_id] = {
+                    "ocr_id": ocr_id,
+                    "place_id": str(place.get("id") or ""),
+                    "place_name": place.get("name") or "",
+                    "item_title": item.get("title") or "",
+                    "original_text": ocr.get("original_text") or "",
+                    "translation_text": row.get("text") or "",
+                    "matched_field": "translation_text"
+                }
+
+    formatted_passages = list(passages_dict.values())[:20]
+
+    return {
+        "places": formatted_places,
+        "passages": formatted_passages
+    }
+
