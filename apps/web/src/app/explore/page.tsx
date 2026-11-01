@@ -14,7 +14,7 @@ const MapExplorer = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="w-full h-full min-h-[520px] rounded-xl border border-line bg-sand-100 flex flex-col items-center justify-center text-ink/50">
+      <div className="w-full h-full min-h-[520px] rounded-card border border-line bg-sand-100 flex flex-col items-center justify-center text-ink/50 shadow-soft">
         <Loader2 className="w-8 h-8 animate-spin text-terracotta mb-2" />
         <span className="text-xs font-mono uppercase tracking-wider">Loading MapLibre GL...</span>
       </div>
@@ -166,11 +166,11 @@ export default function ExplorePage() {
     <div className="min-h-screen flex flex-col bg-sand text-ink">
       <Navbar />
 
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-5 sm:px-8 lg:px-10 py-10 flex flex-col">
         {/* Header Section */}
         <div className="mb-6">
           <div className="flex items-center gap-2 mb-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-terracotta" />
+            <span className="w-1.5 h-1.5 rounded-pill bg-terracotta" />
             <p className="text-[11px] font-bold tracking-widest text-terracotta uppercase">
               {t.routes.explore.badge}
             </p>
@@ -214,7 +214,7 @@ export default function ExplorePage() {
             >
               <span>{t.common.all}</span>
               <span
-                className={`text-[10px] px-1.5 py-0.2 rounded-full font-mono ${
+                className={`text-[10px] px-2 py-0.5 rounded-pill font-mono ${
                   activeFilter === "all"
                     ? "bg-sand text-ink font-semibold"
                     : "bg-sand-200 text-ink/70"
@@ -237,7 +237,7 @@ export default function ExplorePage() {
             >
               <span>{t.common.hasOcr}</span>
               <span
-                className={`text-[10px] px-1.5 py-0.2 rounded-full font-mono ${
+                className={`text-[10px] px-2 py-0.5 rounded-pill font-mono ${
                   activeFilter === "ocr"
                     ? "bg-sand text-ink font-semibold"
                     : "bg-sand-200 text-ink/70"
@@ -260,7 +260,7 @@ export default function ExplorePage() {
             >
               <span>{t.common.stepwells}</span>
               <span
-                className={`text-[10px] px-1.5 py-0.2 rounded-full font-mono ${
+                className={`text-[10px] px-2 py-0.5 rounded-pill font-mono ${
                   activeFilter === "stepwells"
                     ? "bg-sand text-ink font-semibold"
                     : "bg-sand-200 text-ink/70"
@@ -283,7 +283,7 @@ export default function ExplorePage() {
             >
               <span>{t.common.forts}</span>
               <span
-                className={`text-[10px] px-1.5 py-0.2 rounded-full font-mono ${
+                className={`text-[10px] px-2 py-0.5 rounded-pill font-mono ${
                   activeFilter === "forts"
                     ? "bg-sand text-ink font-semibold"
                     : "bg-sand-200 text-ink/70"
@@ -300,14 +300,14 @@ export default function ExplorePage() {
           {/* Left Column: PlaceCard List */}
           <div className="lg:col-span-5 flex flex-col gap-3.5 order-2 lg:order-1">
             {loading ? (
-              <div className="p-8 rounded-lg border border-line bg-white/50 text-center flex flex-col items-center justify-center">
+              <div className="p-10 rounded-card border border-line bg-[#FAF7F2] text-center flex flex-col items-center justify-center shadow-soft">
                 <Loader2 className="w-6 h-6 animate-spin text-terracotta mb-2" />
                 <p className="text-xs text-ink/70 font-sans">
                   {t.routes.explore.loadingPlaces}
                 </p>
               </div>
             ) : filteredPlaces.length === 0 ? (
-              <div className="p-8 rounded-lg border border-line bg-white/50 text-center">
+              <div className="p-10 rounded-card border border-line bg-[#FAF7F2] text-center shadow-soft">
                 <p className="text-sm text-ink/70">
                   {t.routes.explore.noPlacesFound}
                 </p>

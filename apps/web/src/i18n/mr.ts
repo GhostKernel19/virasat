@@ -23,6 +23,7 @@ export const mr: TranslationDictionary = {
       search: "०२ / शोध",
       contribute: "०३ / योगदान",
       place: "०४ / ठिकाण",
+      admin: "०५ / प्रशासन",
     },
   },
   common: {
@@ -112,6 +113,20 @@ export const mr: TranslationDictionary = {
       subtitle: "दप्तर नोंदी, भौगोलिक निर्देशांक, वास्तुकला वर्गवारी आणि ऐतिहासिक स्रोत.",
       badge: "वारसा नोंद",
       back: "अन्वेषण नकाशावर परत जा",
+    },
+    admin: {
+      title: "दप्तर तपासणी व मंजुरी कक्ष",
+      subtitle: "समुदायाने सादर केलेल्या नोंदी तपासा, ओसीआर मजकूर पहा आणि प्रकाशनासाठी मंजुरी द्या.",
+      badge: "प्रशासकीय तपासणी",
+      filterInReview: "तपासणी प्रलंबित",
+      filterPublished: "प्रकाशित",
+      filterAll: "सर्व नोंदी",
+      approveBtn: "प्रकाशनास मंजुरी द्या",
+      approvingBtn: "मंजूर होत आहे...",
+      approvedBadge: "प्रकाशित केले",
+      noItems: "या स्थितीशी जुळणाऱ्या नोंदी नाहीत.",
+      loading: "तपासणी नोंदी लोड होत आहेत...",
+      viewPlace: "स्थळ दस्तऐवज पहा",
     },
   },
 };

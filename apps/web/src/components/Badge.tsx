@@ -28,8 +28,8 @@ export function Badge({
 }: BadgeProps) {
   const sizeClasses =
     size === "sm"
-      ? "text-[11px] px-2 py-0.5 gap-1"
-      : "text-xs px-3 py-1 gap-1.5";
+      ? "text-[11px] px-2.5 py-1 gap-1"
+      : "text-xs px-3.5 py-1.5 gap-1.5";
 
   let variantClasses = "";
 
@@ -40,11 +40,11 @@ export function Badge({
       break;
     case "filter":
       variantClasses =
-        "bg-sand border border-line text-ink/80 hover:text-ink hover:border-ink/30 transition-all font-normal";
+        "bg-sand-50/90 border border-line text-ink/80 hover:text-ink hover:border-ink/30 font-normal";
       break;
     case "ocr":
       variantClasses =
-        "bg-white/80 border border-green/30 text-green font-medium shadow-2xs";
+        "bg-sand-50/90 border border-green/30 text-green font-medium shadow-2xs";
       break;
     case "illustrative":
       variantClasses =
@@ -75,7 +75,7 @@ export function Badge({
 
   return (
     <span
-      className={`inline-flex items-center justify-center rounded-full transition-colors select-none ${sizeClasses} ${variantClasses} ${className}`}
+      className={`inline-flex items-center justify-center rounded-pill transition-all duration-300 ease-soft select-none ${sizeClasses} ${variantClasses} ${className}`}
       {...props}
     >
       {icon && <span className="inline-flex shrink-0 items-center">{icon}</span>}

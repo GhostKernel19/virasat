@@ -360,21 +360,21 @@ export default function ContributePage() {
     switch (status) {
       case "running":
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-500/10 text-amber-700 border border-amber-300">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-pill text-xs font-medium bg-amber-500/10 text-amber-700 border border-amber-300">
             <Loader2 className="w-3 h-3 animate-spin" />
             {t.routes.contribute.statusRunning}
           </span>
         );
       case "done":
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-green/10 text-green border border-green/30">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-pill text-xs font-medium bg-green/10 text-green border border-green/30">
             <CheckCircle2 className="w-3 h-3" />
             {t.routes.contribute.statusDone}
           </span>
         );
       case "failed":
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-500/10 text-red-600 border border-red-300">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-pill text-xs font-medium bg-red-500/10 text-red-600 border border-red-300">
             <AlertCircle className="w-3 h-3" />
             {t.routes.contribute.statusFailed}
           </span>
@@ -382,7 +382,7 @@ export default function ContributePage() {
       case "pending":
       default:
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-ink/5 text-ink/60 border border-line">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-pill text-xs font-medium bg-ink/5 text-ink/60 border border-line">
             <Clock className="w-3 h-3" />
             {t.routes.contribute.statusPending}
           </span>
@@ -396,7 +396,7 @@ export default function ContributePage() {
     <div className="min-h-screen flex flex-col bg-sand text-ink">
       <Navbar />
 
-      <main className="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 py-8">
+      <main className="flex-1 max-w-5xl w-full mx-auto px-5 sm:px-8 lg:px-10 py-10">
         {/* Header */}
         <div className="mb-8">
           <Badge variant="ocr" size="sm" className="mb-2">
@@ -412,7 +412,7 @@ export default function ContributePage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* Contribution Form */}
-          <div className="lg:col-span-6 bg-white/80 rounded-lg border border-line p-6 shadow-sm">
+          <div className="lg:col-span-6 bg-[#FAF7F2] rounded-card border border-line p-8 shadow-soft">
             <form onSubmit={handleSubmit} className="space-y-5">
               {/* Image Upload Field */}
               <div>
@@ -426,7 +426,7 @@ export default function ContributePage() {
                   required
                   disabled={isProcessing}
                   onChange={handleImageChange}
-                  className="w-full text-xs text-ink file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-terracotta/10 file:text-terracotta hover:file:bg-terracotta/20 file:cursor-pointer cursor-pointer border border-line rounded-lg p-2 bg-sand-50/50 focus:outline-none focus:ring-1 focus:ring-terracotta"
+                  className="w-full text-xs text-ink file:mr-3 file:py-2 file:px-4 file:rounded-control file:border-0 file:text-xs file:font-semibold file:bg-terracotta/10 file:text-terracotta hover:file:bg-terracotta/20 file:cursor-pointer cursor-pointer border border-line rounded-control p-2.5 bg-sand-50/80 focus:outline-none focus:ring-1 focus:ring-terracotta"
                 />
                 <p className="mt-1 text-[11px] text-ink/60">
                   {t.routes.contribute.imageHint}
@@ -434,13 +434,13 @@ export default function ContributePage() {
 
                 {/* Image Preview */}
                 {imagePreview && (
-                  <div className="mt-3 p-3 bg-sand-50/70 border border-line rounded-lg flex flex-col items-center">
-                    <div className="relative max-h-56 w-full flex items-center justify-center overflow-hidden rounded bg-ink/5">
+                  <div className="mt-3 p-4 bg-sand-50/90 border border-line rounded-control flex flex-col items-center">
+                    <div className="relative max-h-56 w-full flex items-center justify-center overflow-hidden rounded-control bg-ink/5">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={imagePreview}
                         alt="Upload preview"
-                        className="max-h-56 w-auto object-contain rounded"
+                        className="max-h-56 w-auto object-contain rounded-control"
                       />
                     </div>
                     {imageFile && (
@@ -464,7 +464,7 @@ export default function ContributePage() {
                   disabled={isProcessing}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder={t.routes.contribute.titlePlaceholder}
-                  className="w-full px-3 py-2 text-sm bg-sand-50/50 border border-line rounded-lg focus:outline-none focus:ring-1 focus:ring-terracotta focus:border-terracotta disabled:opacity-50"
+                  className="w-full px-4 py-2.5 text-sm bg-sand-50/80 border border-line rounded-control focus:outline-none focus:ring-1 focus:ring-terracotta focus:border-terracotta focus:bg-[#FDFBF7] disabled:opacity-50"
                 />
               </div>
 
@@ -478,7 +478,7 @@ export default function ContributePage() {
                   value={selectedPlaceId}
                   disabled={isProcessing || loadingPlaces}
                   onChange={(e) => setSelectedPlaceId(e.target.value)}
-                  className="w-full px-3 py-2 text-sm bg-sand-50/50 border border-line rounded-lg focus:outline-none focus:ring-1 focus:ring-terracotta focus:border-terracotta disabled:opacity-50"
+                  className="w-full px-4 py-2.5 text-sm bg-sand-50/80 border border-line rounded-control focus:outline-none focus:ring-1 focus:ring-terracotta focus:border-terracotta focus:bg-[#FDFBF7] disabled:opacity-50"
                 >
                   <option value="">
                     {loadingPlaces
@@ -498,7 +498,7 @@ export default function ContributePage() {
 
               {/* Form Validation Error */}
               {formError && (
-                <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-xs flex items-center gap-2">
+                <div className="p-4 bg-red-50 border border-red-200 rounded-control text-red-700 text-xs flex items-center gap-2">
                   <AlertCircle className="w-4 h-4 flex-shrink-0" />
                   <span>{formError}</span>
                 </div>
@@ -506,7 +506,7 @@ export default function ContributePage() {
 
               {/* API Submit Error */}
               {submitError && (
-                <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-xs flex items-center gap-2">
+                <div className="p-4 bg-red-50 border border-red-200 rounded-control text-red-700 text-xs flex items-center gap-2">
                   <AlertCircle className="w-4 h-4 flex-shrink-0" />
                   <span>{submitError}</span>
                 </div>
@@ -545,7 +545,7 @@ export default function ContributePage() {
           {/* Pipeline Status & Results Section */}
           <div className="lg:col-span-6 space-y-6">
             {/* Pipeline Stage Tracker */}
-            <div className="bg-white/80 rounded-lg border border-line p-6 shadow-sm">
+            <div className="bg-[#FAF7F2] rounded-card border border-line p-8 shadow-soft">
               <div className="flex items-center justify-between pb-3 mb-4 border-b border-line">
                 <h2 className="font-semibold text-sm text-ink flex items-center gap-2">
                   <FileText className="w-4 h-4 text-terracotta" />
@@ -558,7 +558,7 @@ export default function ContributePage() {
 
               {/* Timeout Error */}
               {timeoutError && (
-                <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg text-amber-800 text-xs flex items-start gap-2">
+                <div className="mb-4 p-4 bg-amber-50 border border-amber-200 rounded-control text-amber-800 text-xs flex items-start gap-2">
                   <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5 text-amber-600" />
                   <div>
                     <strong>Pipeline Timeout:</strong> {t.routes.contribute.timeoutMessage}
@@ -568,7 +568,7 @@ export default function ContributePage() {
 
               {/* Stage Failure Banner */}
               {failedJob && (
-                <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-xs flex items-start gap-2">
+                <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-control text-red-700 text-xs flex items-start gap-2">
                   <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5 text-red-600" />
                   <div>
                     <div className="font-semibold">
@@ -591,7 +591,7 @@ export default function ContributePage() {
                   return (
                     <div
                       key={stageKey}
-                      className="p-3 bg-sand-50/50 rounded-lg border border-line flex items-center justify-between gap-3"
+                      className="p-4 bg-sand-50/80 rounded-control border border-line flex items-center justify-between gap-3 shadow-xs"
                     >
                       <div>
                         <div className="text-xs font-medium text-ink">
@@ -617,7 +617,7 @@ export default function ContributePage() {
 
             {/* Results Display */}
             {resultItem && (
-              <div className="bg-white/80 rounded-lg border border-line p-6 shadow-sm space-y-5">
+              <div className="bg-[#FAF7F2] rounded-card border border-line p-8 shadow-soft space-y-5">
                 <div className="flex items-center justify-between pb-3 border-b border-line">
                   <h2 className="font-semibold text-sm text-green flex items-center gap-1.5">
                     <CheckCircle2 className="w-4 h-4" />
@@ -639,12 +639,12 @@ export default function ContributePage() {
                     <ImageIcon className="w-3.5 h-3.5 text-ink/60" />
                     Uploaded Archival Image
                   </span>
-                  <div className="relative max-h-64 w-full flex items-center justify-center overflow-hidden rounded-lg border border-line bg-ink/5 p-2">
+                  <div className="relative max-h-64 w-full flex items-center justify-center overflow-hidden rounded-control border border-line bg-ink/5 p-2">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={resultItem.media?.[0]?.url || imagePreview || ""}
                       alt={resultItem.title || "Uploaded image"}
-                      className="max-h-60 w-auto object-contain rounded"
+                      className="max-h-60 w-auto object-contain rounded-control"
                     />
                   </div>
                 </div>
@@ -673,14 +673,14 @@ export default function ContributePage() {
                   <span className="block text-xs font-semibold text-ink uppercase tracking-wider mb-2">
                     Transcription & Translation
                   </span>
-                  <div className="overflow-x-auto rounded-lg border border-line">
+                  <div className="overflow-x-auto rounded-control border border-line">
                     <table className="w-full text-left text-xs border-collapse">
                       <thead>
                         <tr className="bg-sand-100 border-b border-line text-ink/70">
-                          <th className="py-2 px-3 font-semibold w-1/2">
+                          <th className="py-2.5 px-3.5 font-semibold w-1/2">
                             {t.routes.contribute.devanagariHeader}
                           </th>
-                          <th className="py-2 px-3 font-semibold w-1/2">
+                          <th className="py-2.5 px-3.5 font-semibold w-1/2">
                             {t.routes.contribute.translationHeader}
                           </th>
                         </tr>
@@ -688,7 +688,7 @@ export default function ContributePage() {
                       <tbody className="divide-y divide-line bg-white/50">
                         {buildLinePairs(resultItem).map((pair, idx) => (
                           <tr key={idx} className="hover:bg-sand-50/50 transition-colors">
-                            <td className="py-2.5 px-3 font-devanagari text-ink font-medium leading-relaxed align-top">
+                            <td className="py-3 px-3.5 font-devanagari text-ink font-medium leading-relaxed align-top">
                               {pair.original}
                               {pair.confidence !== undefined && (
                                 <span className="block text-[10px] text-ink/40 font-mono mt-0.5">
@@ -696,7 +696,7 @@ export default function ContributePage() {
                                 </span>
                               )}
                             </td>
-                            <td className="py-2.5 px-3 text-ink/80 leading-relaxed align-top">
+                            <td className="py-3 px-3.5 text-ink/80 leading-relaxed align-top">
                               {pair.translation}
                             </td>
                           </tr>

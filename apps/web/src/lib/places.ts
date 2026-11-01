@@ -118,23 +118,27 @@ export async function fetchPlacesFromSupabase(): Promise<Place[]> {
       return FALLBACK_PLACES;
     }
 
-    // Check heritage items to determine OCR presence
+    // Query published heritage items to determine OCR presence and real record count
     const { data: itemsData } = await supabase
       .from("heritage_items")
-      .select("id, place_id");
+      .select("id, place_id, status")
+      .in("status", ["published", "verified"]);
 
-    const itemsList = (itemsData as Array<{ id: string; place_id: string }> | null) ?? [];
-    const itemsByPlace = new Set(itemsList.map((item) => item.place_id));
+    const itemsList = (itemsData as Array<{ id: string; place_id: string; status?: string }> | null) ?? [];
+    const countByPlace: Record<string, number> = {};
+    for (const item of itemsList) {
+      countByPlace[item.place_id] = (countByPlace[item.place_id] || 0) + 1;
+    }
 
     return placesData.map((row: PlaceRecord) => {
       const meta = KNOWN_METADATA[row.name] || {
         slug: row.id,
         marathiName: row.name,
         imageUrl: "/places/rani-ki-vav.png",
-        recordsCount: 6,
       };
 
-      const hasOcr = itemsByPlace.has(row.id) || row.name === "Rani ki Vav" || row.name === "Amer Fort" || row.name === "Hampi";
+      const realCount = countByPlace[row.id] ?? 0;
+      const hasOcr = realCount > 0;
 
       return {
         id: row.id,
@@ -150,7 +154,7 @@ export async function fetchPlacesFromSupabase(): Promise<Place[]> {
         summary: row.summary ? row.summary.replace(/^\[Illustrative\]\s*/i, "") : "",
         imageUrl: meta.imageUrl,
         hasOcr,
-        recordsCount: meta.recordsCount,
+        recordsCount: realCount,
         isIllustrative: row.is_illustrative,
       };
     });

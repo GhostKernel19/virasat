@@ -63,14 +63,14 @@ export function PlaceCard({
       onClick={onClick}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
-      className={`group relative flex items-start gap-3.5 p-3.5 rounded-lg border transition-all text-left bg-sand-50/90 ${
+      className={`group relative flex items-start gap-4 p-4.5 rounded-card border transition-all duration-300 ease-soft text-left bg-[#FAF7F2] shadow-soft ${
         isSelected
-          ? "border-terracotta bg-white shadow-md ring-1 ring-terracotta/20"
-          : "border-line hover:border-terracotta/60 hover:bg-white hover:shadow-sm"
+          ? "border-terracotta bg-[#FDFBF7] shadow-lift -translate-y-1 ring-1 ring-terracotta/20"
+          : "border-line hover:border-terracotta/60 hover:bg-[#FDFBF7] hover:shadow-lift hover:-translate-y-1"
       } ${onClick || targetHref ? "cursor-pointer" : ""} ${className}`}
     >
       {/* Thumbnail */}
-      <div className="relative w-20 h-20 shrink-0 overflow-hidden rounded-md border border-line/60 bg-sand-200/50">
+      <div className="relative w-20 h-20 shrink-0 overflow-hidden rounded-control border border-line bg-sand-200/50">
         {!imageError && imageUrl ? (
           <Image
             src={imageUrl}

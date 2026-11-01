@@ -17,6 +17,12 @@ const config: Config = {
           200: "#EFE7DC",
           300: "#E2D7C5",
         },
+        surface: {
+          DEFAULT: "#FAF7F2",
+          card: "#FAF7F2",
+          muted: "#F5EFE6",
+          soft: "#FDFBF7",
+        },
         terracotta: {
           DEFAULT: "#C65D3B",
           light: "#D77252",
@@ -49,8 +55,13 @@ const config: Config = {
           subtle: "#9CA3AF",
         },
         line: {
-          DEFAULT: "#E5DED2",
-          dark: "#D6CCC0",
+          DEFAULT: "rgba(46, 27, 16, 0.10)",
+          soft: "rgba(46, 27, 16, 0.08)",
+          dark: "rgba(46, 27, 16, 0.16)",
+        },
+        border: {
+          DEFAULT: "rgba(46, 27, 16, 0.10)",
+          soft: "rgba(46, 27, 16, 0.10)",
         },
       },
       fontFamily: {
@@ -62,8 +73,28 @@ const config: Config = {
         mukta: ["var(--font-mukta)", "sans-serif"],
       },
       borderRadius: {
-        DEFAULT: "8px",
-        lg: "8px",
+        DEFAULT: "14px",
+        card: "20px",
+        control: "14px",
+        pill: "999px",
+        lg: "20px",
+        md: "14px",
+        full: "999px",
+      },
+      boxShadow: {
+        soft: "0 10px 40px -12px rgba(46, 27, 16, 0.18)",
+        lift: "0 24px 60px -20px rgba(46, 27, 16, 0.28)",
+        sm: "0 4px 16px -4px rgba(46, 27, 16, 0.08)",
+        md: "0 10px 40px -12px rgba(46, 27, 16, 0.18)",
+        lg: "0 24px 60px -20px rgba(46, 27, 16, 0.28)",
+      },
+      transitionTimingFunction: {
+        DEFAULT: "cubic-bezier(0.22, 1, 0.36, 1)",
+        soft: "cubic-bezier(0.22, 1, 0.36, 1)",
+      },
+      transitionDuration: {
+        DEFAULT: "300ms",
+        300: "300ms",
       },
     },
   },

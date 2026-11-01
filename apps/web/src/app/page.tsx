@@ -14,7 +14,7 @@ export default function HomePage() {
       <Navbar />
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden isolate w-full bg-[var(--hero-brown-2)] py-20 sm:py-28 lg:py-36 px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center text-center">
+      <section className="relative overflow-hidden isolate w-full bg-[var(--hero-brown-2)] py-24 sm:py-32 lg:py-40 px-5 sm:px-8 lg:px-10 flex flex-col items-center justify-center text-center">
         <HeroVideo />
 
         {/* Hero Text and CTAs */}
@@ -44,7 +44,7 @@ export default function HomePage() {
                 variant="secondary"
                 size="lg"
                 iconRight={<ArrowRight className="w-4 h-4" />}
-                className="bg-sand/15 hover:bg-sand/25 text-sand border border-sand/30 backdrop-blur-xs shadow-sm"
+                className="bg-sand/15 hover:bg-sand/25 text-sand border border-sand/30 backdrop-blur-xs shadow-soft"
               >
                 {t.routes.home.ctaContribute}
               </Button>
@@ -53,7 +53,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <main className="relative z-10 flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <main className="relative z-10 flex-1 max-w-7xl w-full mx-auto px-5 sm:px-8 lg:px-10 py-12">
         {/* Quick Metrics & Collection Overview */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-line pb-6 mb-8">
           <div>
@@ -138,7 +138,7 @@ export default function HomePage() {
         </div>
 
         {/* Action Callout Banner matching bottom of screenshot */}
-        <div className="p-4 rounded-lg border border-line bg-sand-50/60 flex flex-col sm:flex-row items-center justify-between gap-4 mb-8">
+        <div className="p-5 rounded-card border border-line bg-[#FAF7F2] shadow-soft flex flex-col sm:flex-row items-center justify-between gap-4 mb-8">
           <div className="flex items-center gap-3">
             <span className="text-terracotta text-lg">✦</span>
             <p className="text-xs sm:text-sm text-ink/75 font-serif italic">
@@ -157,7 +157,7 @@ export default function HomePage() {
         </div>
 
         {/* Route Index Hub */}
-        <div className="border border-line rounded-lg p-6 bg-white/60">
+        <div className="border border-line rounded-card p-8 bg-[#FAF7F2] shadow-soft">
           <h2 className="font-serif text-lg font-semibold text-ink mb-2">
             Scaffolded Route Placeholders
           </h2>
@@ -167,7 +167,7 @@ export default function HomePage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
             <Link
               href="/explore"
-              className="p-3 rounded-lg border border-line hover:border-terracotta bg-sand-50 hover:bg-white transition-all text-xs flex items-center justify-between group"
+              className="p-4 rounded-control border border-line hover:border-terracotta bg-sand-50/80 hover:bg-[#FDFBF7] shadow-xs hover:shadow-soft hover:-translate-y-1 transition-all duration-300 ease-soft text-xs flex items-center justify-between group"
             >
               <span className="font-medium flex items-center gap-2">
                 <Compass className="w-3.5 h-3.5 text-terracotta" />
@@ -178,7 +178,7 @@ export default function HomePage() {
 
             <Link
               href="/search"
-              className="p-3 rounded-lg border border-line hover:border-terracotta bg-sand-50 hover:bg-white transition-all text-xs flex items-center justify-between group"
+              className="p-4 rounded-control border border-line hover:border-terracotta bg-sand-50/80 hover:bg-[#FDFBF7] shadow-xs hover:shadow-soft hover:-translate-y-1 transition-all duration-300 ease-soft text-xs flex items-center justify-between group"
             >
               <span className="font-medium flex items-center gap-2">
                 <Search className="w-3.5 h-3.5 text-indigo" />
@@ -189,7 +189,7 @@ export default function HomePage() {
 
             <Link
               href="/contribute"
-              className="p-3 rounded-lg border border-line hover:border-terracotta bg-sand-50 hover:bg-white transition-all text-xs flex items-center justify-between group"
+              className="p-4 rounded-control border border-line hover:border-terracotta bg-sand-50/80 hover:bg-[#FDFBF7] shadow-xs hover:shadow-soft hover:-translate-y-1 transition-all duration-300 ease-soft text-xs flex items-center justify-between group"
             >
               <span className="font-medium flex items-center gap-2">
                 <PlusCircle className="w-3.5 h-3.5 text-green" />
@@ -200,7 +200,7 @@ export default function HomePage() {
 
             <Link
               href="/place/rani-ki-vav"
-              className="p-3 rounded-lg border border-line hover:border-terracotta bg-sand-50 hover:bg-white transition-all text-xs flex items-center justify-between group"
+              className="p-4 rounded-control border border-line hover:border-terracotta bg-sand-50/80 hover:bg-[#FDFBF7] shadow-xs hover:shadow-soft hover:-translate-y-1 transition-all duration-300 ease-soft text-xs flex items-center justify-between group"
             >
               <span className="font-medium flex items-center gap-2">
                 <span className="text-gold">🏛</span>

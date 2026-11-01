@@ -31,7 +31,7 @@ export function Footer({ pageCode, className = "" }: FooterProps) {
 
   return (
     <footer
-      className={`w-full border-t border-line bg-sand py-4 px-4 sm:px-6 lg:px-8 mt-auto text-xs text-ink/65 ${className}`}
+      className={`w-full border-t border-line bg-sand py-6 px-5 sm:px-8 lg:px-10 mt-auto text-xs text-ink/65 ${className}`}
     >
       <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
         {/* Left: Brand prefix and heritage atlas tagline */}

@@ -298,11 +298,11 @@ export function MapExplorer({
             transition={{ duration: shouldReduceMotion ? 0 : 0.28, ease: "easeOut" }}
             className="absolute bottom-4 left-4 right-4 z-20"
           >
-            <div className="p-4 rounded-lg border border-line bg-sand-50/95 backdrop-blur-md shadow-xl text-ink">
+            <div className="p-5.5 rounded-card border border-line bg-[#FAF7F2]/95 backdrop-blur-md shadow-soft text-ink">
               {/* Panel Top Bar */}
               <div className="flex items-center justify-between pb-2 mb-3 border-b border-line/70">
                 <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-terracotta animate-pulse" />
+                  <span className="w-2 h-2 rounded-pill bg-terracotta animate-pulse" />
                   <span className="text-[10px] font-bold uppercase tracking-wider text-terracotta font-mono">
                     {t.routes.explore.selectedPlace}
                   </span>
@@ -315,7 +315,7 @@ export function MapExplorer({
                   type="button"
                   onClick={() => setPanelDismissed(true)}
                   aria-label="Dismiss panel"
-                  className="p-1 rounded text-ink/50 hover:text-ink hover:bg-black/5 transition-colors"
+                  className="p-1.5 rounded-control text-ink/50 hover:text-ink hover:bg-black/5 transition-all duration-300 ease-soft"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -323,7 +323,7 @@ export function MapExplorer({
 
               {/* Panel Content Body */}
               <div className="flex items-start gap-3.5">
-                <div className="relative w-16 h-16 shrink-0 rounded-md overflow-hidden border border-line bg-sand-200">
+                <div className="relative w-16 h-16 shrink-0 rounded-control overflow-hidden border border-line bg-sand-200 shadow-soft">
                   {selectedPlace.imageUrl ? (
                     <Image
                       src={selectedPlace.imageUrl}

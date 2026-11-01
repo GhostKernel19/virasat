@@ -29,34 +29,34 @@ export function Button({
   children,
   ...props
 }: ButtonProps) {
-  let sizeClasses = "text-sm px-4 py-2 rounded-lg gap-2";
+  let sizeClasses = "text-sm px-5 py-2.5 rounded-control gap-2";
   if (size === "sm") {
-    sizeClasses = "text-xs px-3 py-1.5 rounded-lg gap-1.5";
+    sizeClasses = "text-xs px-3.5 py-2 rounded-control gap-1.5";
   } else if (size === "lg") {
-    sizeClasses = "text-base px-6 py-2.5 rounded-lg gap-2.5";
+    sizeClasses = "text-base px-7 py-3 rounded-control gap-2.5";
   }
 
   let variantClasses = "";
   switch (variant) {
     case "primary":
       variantClasses =
-        "bg-terracotta hover:bg-terracotta-dark text-sand shadow-sm hover:shadow transition-all active:scale-[0.98] font-medium";
+        "bg-terracotta hover:bg-terracotta-dark text-sand shadow-sm hover:shadow-soft transition-all duration-300 ease-soft active:scale-[0.98] font-medium";
       break;
     case "secondary":
       variantClasses =
-        "bg-indigo hover:bg-indigo-light text-sand shadow-sm hover:shadow transition-all active:scale-[0.98] font-medium";
+        "bg-indigo hover:bg-indigo-light text-sand shadow-sm hover:shadow-soft transition-all duration-300 ease-soft active:scale-[0.98] font-medium";
       break;
     case "outline":
       variantClasses =
-        "border border-line hover:border-terracotta hover:text-terracotta text-ink bg-white/80 hover:bg-white shadow-2xs transition-all font-medium";
+        "border border-line hover:border-terracotta hover:text-terracotta text-ink bg-sand-50/90 hover:bg-surface shadow-2xs hover:shadow-soft transition-all duration-300 ease-soft font-medium";
       break;
     case "ghost":
       variantClasses =
-        "text-ink/80 hover:text-ink hover:bg-sand-200/70 transition-colors font-medium";
+        "text-ink/80 hover:text-ink hover:bg-sand-200/70 transition-all duration-300 ease-soft font-medium";
       break;
     case "link":
       variantClasses =
-        "text-terracotta hover:text-terracotta-dark underline-offset-4 hover:underline p-0 font-medium";
+        "text-terracotta hover:text-terracotta-dark underline-offset-4 hover:underline p-0 font-medium transition-all duration-300 ease-soft";
       sizeClasses = "text-sm gap-1";
       break;
   }

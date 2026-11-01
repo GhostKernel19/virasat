@@ -1,11 +1,11 @@
 "use client";
 
-import React, { useState, useEffect, useCallback, Suspense } from "react";
+import React, { useState, useEffect, useCallback, useRef, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Navbar, Footer, Badge } from "@/components";
 import { useLanguage } from "@/i18n";
-import { Search, Loader2, ArrowRight, X } from "lucide-react";
+import { Search, Loader2, ArrowRight, X, AlertCircle } from "lucide-react";
 
 interface SearchPlace {
   id: string;
@@ -68,120 +68,204 @@ function highlightMatch(text: string, query: string): React.ReactNode {
   }
 }
 
+/**
+ * Helper to determine if a type filter represents "All" / unconstrained.
+ */
+function isAllTypes(val?: string | null): boolean {
+  if (!val) return true;
+  const s = val.trim().toLowerCase();
+  return (
+    s === "" ||
+    s === "all" ||
+    s === "all types" ||
+    s === "all_types" ||
+    s === "alltypes" ||
+    s === "सर्व प्रकार"
+  );
+}
+
+/**
+ * Builds the search request URL per requirements:
+ * - Uses process.env.NEXT_PUBLIC_API_URL (fallback: http://localhost:8000)
+ * - Encodes q with encodeURIComponent
+ * - Omit type parameter completely when All Types or empty is selected
+ */
+function buildSearchUrl(searchTerm: string, typeFilter?: string | null): string {
+  const baseUrl = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000").replace(/\/$/, "");
+  let url = `${baseUrl}/search?q=${encodeURIComponent(searchTerm.trim())}`;
+  if (typeFilter && !isAllTypes(typeFilter)) {
+    url += `&type=${encodeURIComponent(typeFilter.trim())}`;
+  }
+  return url;
+}
+
 function SearchContent() {
   const { t } = useLanguage();
   const searchParams = useSearchParams();
   const router = useRouter();
 
   const urlQuery = searchParams.get("q") || "";
+  const rawUrlType = searchParams.get("type") || "";
+  const urlType = isAllTypes(rawUrlType) ? "" : rawUrlType;
+
   const [query, setQuery] = useState(urlQuery);
-  const [selectedType, setSelectedType] = useState<string>("");
+  const [selectedType, setSelectedType] = useState<string>(urlType);
   const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [results, setResults] = useState<SearchResponse | null>(null);
   const [hasSearched, setHasSearched] = useState(Boolean(urlQuery.trim()));
 
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+  // Track the last successfully fetched search key to avoid duplicate/redundant fetches
+  const lastFetchedKeyRef = useRef<string>("");
 
   // Perform search call to backend API
   const performSearch = useCallback(
     async (searchTerm: string, typeFilter: string) => {
       const trimmed = searchTerm.trim();
       if (!trimmed) {
-        setResults({ places: [], passages: [] });
+        setResults(null);
         setLoading(false);
         setHasSearched(false);
+        setErrorMessage(null);
+        lastFetchedKeyRef.current = "";
         return;
       }
 
+      const activeType = isAllTypes(typeFilter) ? "" : typeFilter.trim();
+      const searchKey = `${trimmed}:::${activeType}`;
+
       setLoading(true);
       setHasSearched(true);
+      setErrorMessage(null);
+
+      const requestUrl = buildSearchUrl(trimmed, activeType);
+      console.log("Search request URL:", requestUrl);
 
       try {
-        const params = new URLSearchParams();
-        params.set("q", trimmed);
-        if (typeFilter) {
-          params.set("type", typeFilter);
+        const res = await fetch(requestUrl);
+        if (!res.ok) {
+          const errorBody = await res.text().catch(() => "");
+          const errorMsg = `Search request failed with status ${res.status}: ${errorBody || res.statusText}`;
+          console.error("Search request failed:", errorMsg);
+          setErrorMessage(errorMsg);
+          setResults({ places: [], passages: [] });
+          return;
         }
 
-        const res = await fetch(`${API_URL}/search?${params.toString()}`);
-        if (!res.ok) {
-          throw new Error(`Search request failed with status ${res.status}`);
-        }
         const data: SearchResponse = await res.json();
+        console.log("Search response:", data);
+
+        // Read data.places and data.passages exactly as returned
+        const places = Array.isArray(data?.places) ? data.places : [];
+        const passages = Array.isArray(data?.passages) ? data.passages : [];
+
         setResults({
-          places: Array.isArray(data.places) ? data.places : [],
-          passages: Array.isArray(data.passages) ? data.passages : [],
+          places,
+          passages,
         });
-      } catch (err) {
+        setErrorMessage(null);
+        lastFetchedKeyRef.current = searchKey;
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : String(err);
+        const fullErr = `Failed to connect to search API: ${msg}. URL: ${requestUrl}`;
         console.error("Search API error:", err);
+        setErrorMessage(fullErr);
         setResults({ places: [], passages: [] });
       } finally {
         setLoading(false);
       }
     },
-    [API_URL]
+    []
   );
 
-  // Sync state if URL ?q= param changes externally
+  // Synchronize state with URL parameters (supports direct navigation e.g. /search?q=hampi)
   useEffect(() => {
-    if (urlQuery !== query) {
-      setQuery(urlQuery);
-      if (urlQuery.trim()) {
-        performSearch(urlQuery, selectedType);
+    const qParam = searchParams.get("q") || "";
+    const tParam = searchParams.get("type") || "";
+    const cleanType = isAllTypes(tParam) ? "" : tParam;
+
+    setQuery(qParam);
+    setSelectedType(cleanType);
+
+    if (qParam.trim()) {
+      const searchKey = `${qParam.trim()}:::${cleanType}`;
+      if (lastFetchedKeyRef.current !== searchKey) {
+        performSearch(qParam, cleanType);
       }
+    } else {
+      setResults(null);
+      setHasSearched(false);
+      setErrorMessage(null);
+      lastFetchedKeyRef.current = "";
     }
-  }, [urlQuery]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [searchParams, performSearch]);
 
-  // Initial search if query was in URL on first mount
+  // Debounced search on typing (300ms) for user interaction in input
   useEffect(() => {
-    if (urlQuery.trim()) {
-      performSearch(urlQuery, selectedType);
-    }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
-  // Debounced search on typing (300ms)
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      // Update URL query param quietly
-      if (query.trim()) {
-        const params = new URLSearchParams(window.location.search);
-        params.set("q", query.trim());
-        window.history.replaceState(null, "", `/search?${params.toString()}`);
-        performSearch(query, selectedType);
-      } else {
-        window.history.replaceState(null, "", "/search");
-        setResults({ places: [], passages: [] });
+    if (!query.trim()) {
+      if (lastFetchedKeyRef.current !== "") {
+        setResults(null);
         setHasSearched(false);
+        setErrorMessage(null);
+        lastFetchedKeyRef.current = "";
+        window.history.replaceState(null, "", "/search");
       }
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      const activeType = isAllTypes(selectedType) ? "" : selectedType.trim();
+      const searchKey = `${query.trim()}:::${activeType}`;
+
+      // Skip if URL sync already performed this exact query
+      if (lastFetchedKeyRef.current === searchKey) {
+        return;
+      }
+
+      // Update URL quietly to reflect user input
+      const params = new URLSearchParams();
+      params.set("q", query.trim());
+      if (activeType) {
+        params.set("type", activeType);
+      }
+      window.history.replaceState(null, "", `/search?${params.toString()}`);
+
+      performSearch(query, activeType);
     }, 300);
 
-    return () => clearTimeout(handler);
+    return () => clearTimeout(timer);
   }, [query, selectedType, performSearch]);
 
   // Handle immediate form submission on Enter
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (query.trim()) {
-      const params = new URLSearchParams(window.location.search);
+      const activeType = isAllTypes(selectedType) ? "" : selectedType.trim();
+      const params = new URLSearchParams();
       params.set("q", query.trim());
+      if (activeType) {
+        params.set("type", activeType);
+      }
       router.replace(`/search?${params.toString()}`);
-      performSearch(query, selectedType);
+      performSearch(query, activeType);
     }
   };
 
   const handleClear = () => {
     setQuery("");
-    setResults({ places: [], passages: [] });
+    setSelectedType("");
+    setResults(null);
     setHasSearched(false);
+    setErrorMessage(null);
+    lastFetchedKeyRef.current = "";
     window.history.replaceState(null, "", "/search");
   };
 
   const places = results?.places || [];
   const passages = results?.passages || [];
-  const totalCount = places.length + passages.length;
 
   return (
-    <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <main className="flex-1 max-w-7xl w-full mx-auto px-5 sm:px-8 lg:px-10 py-10">
       {/* Header Badge & Title */}
       <div className="mb-6">
         <p className="text-[11px] font-bold tracking-widest text-indigo uppercase mb-1">
@@ -196,7 +280,7 @@ function SearchContent() {
       </div>
 
       {/* Search Bar & Type Filter Control */}
-      <div className="bg-white/80 border border-line rounded-lg p-4 mb-8 shadow-xs">
+      <div className="bg-[#FAF7F2] border border-line rounded-card p-5 mb-8 shadow-soft">
         <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3">
           {/* Input container */}
           <div className="relative flex-1">
@@ -205,7 +289,7 @@ function SearchContent() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder={t.routes.search.placeholder}
-              className="w-full pl-9 pr-8 py-2.5 rounded-lg border border-line bg-sand-50/60 text-xs sm:text-sm text-ink placeholder:text-ink/40 focus:outline-none focus:border-terracotta focus:bg-white transition-colors"
+              className="w-full pl-9 pr-8 py-2.5 rounded-control border border-line bg-sand-50/80 text-xs sm:text-sm text-ink placeholder:text-ink/40 focus:outline-none focus:border-terracotta focus:bg-[#FDFBF7] transition-all duration-300 ease-soft"
             />
             <Search className="w-4 h-4 text-ink/40 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
             {query && (
@@ -227,9 +311,13 @@ function SearchContent() {
             </label>
             <select
               id="place-type"
-              value={selectedType}
-              onChange={(e) => setSelectedType(e.target.value)}
-              className="px-3 py-2.5 rounded-lg border border-line bg-sand-50/60 text-xs sm:text-sm text-ink focus:outline-none focus:border-terracotta focus:bg-white cursor-pointer"
+              value={isAllTypes(selectedType) ? "" : selectedType}
+              onChange={(e) => {
+                const val = e.target.value;
+                const newType = isAllTypes(val) ? "" : val;
+                setSelectedType(newType);
+              }}
+              className="px-3 py-2.5 rounded-control border border-line bg-sand-50/80 text-xs sm:text-sm text-ink focus:outline-none focus:border-terracotta focus:bg-[#FDFBF7] cursor-pointer transition-all duration-300 ease-soft"
             >
               <option value="">{t.routes.search.allTypes}</option>
               <option value="Stepwell">Stepwell</option>
@@ -240,6 +328,23 @@ function SearchContent() {
         </form>
       </div>
 
+      {/* Error Message Banner */}
+      {errorMessage && (
+        <div className="mb-6 p-5 rounded-card border border-terracotta/40 bg-terracotta/10 text-ink shadow-soft">
+          <div className="flex items-start gap-2.5">
+            <AlertCircle className="w-5 h-5 text-terracotta shrink-0 mt-0.5" />
+            <div>
+              <p className="text-xs font-semibold text-terracotta uppercase tracking-wider mb-0.5">
+                Search Request Error
+              </p>
+              <p className="text-xs sm:text-sm text-ink/85 font-mono break-all">
+                {errorMessage}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Loading Indicator */}
       {loading && (
         <div className="py-16 flex flex-col items-center justify-center text-ink/60">
@@ -248,10 +353,10 @@ function SearchContent() {
         </div>
       )}
 
-      {/* Empty State: Query Executed but No Results Found */}
-      {!loading && hasSearched && totalCount === 0 && (
-        <div className="py-16 text-center max-w-md mx-auto p-6 rounded-lg border border-line bg-white/50">
-          <div className="w-10 h-10 rounded-full bg-sand-200/80 text-ink/40 flex items-center justify-center mx-auto mb-3">
+      {/* Empty State: Query Executed, No Error, but BOTH Places and Passages are Empty */}
+      {!loading && !errorMessage && hasSearched && places.length === 0 && passages.length === 0 && (
+        <div className="py-16 text-center max-w-md mx-auto p-8 rounded-card border border-line bg-[#FAF7F2] shadow-soft">
+          <div className="w-10 h-10 rounded-pill bg-sand-200/80 text-ink/40 flex items-center justify-center mx-auto mb-3">
             <Search className="w-5 h-5" />
           </div>
           <h3 className="font-serif text-base sm:text-lg font-medium text-ink mb-1">
@@ -273,10 +378,10 @@ function SearchContent() {
         </div>
       )}
 
-      {/* Results Content */}
-      {!loading && hasSearched && totalCount > 0 && (
+      {/* Results Content: Render if places OR passages exist */}
+      {!loading && hasSearched && (places.length > 0 || passages.length > 0) && (
         <div className="space-y-10">
-          {/* 1. Places Section */}
+          {/* 1. Places Section: Renders even when passages is empty */}
           {places.length > 0 && (
             <section aria-labelledby="section-places">
               <div className="flex items-center justify-between border-b border-line pb-2.5 mb-4">
@@ -291,12 +396,12 @@ function SearchContent() {
                 </h2>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                 {places.map((place) => (
                   <Link
                     key={place.id}
                     href={`/place/${place.id}`}
-                    className="p-4 rounded-lg border border-line bg-white/70 hover:bg-white hover:border-terracotta hover:shadow-2xs transition-all flex flex-col justify-between group no-underline text-ink"
+                    className="p-5.5 rounded-card border border-line bg-[#FAF7F2] hover:bg-[#FDFBF7] hover:border-terracotta shadow-soft hover:shadow-lift hover:-translate-y-1 transition-all duration-300 ease-soft flex flex-col justify-between group no-underline text-ink"
                   >
                     <div>
                       <div className="flex items-start justify-between gap-2 mb-1.5">
@@ -352,11 +457,11 @@ function SearchContent() {
                 </h2>
               </div>
 
-              <div className="space-y-4">
+              <div className="space-y-5">
                 {passages.map((passage) => (
                   <div
                     key={passage.ocr_id}
-                    className="p-5 rounded-lg border border-line bg-white/70 hover:bg-white transition-all flex flex-col gap-3"
+                    className="p-6 rounded-card border border-line bg-[#FAF7F2] hover:bg-[#FDFBF7] shadow-soft hover:shadow-lift hover:-translate-y-1 transition-all duration-300 ease-soft flex flex-col gap-3.5"
                   >
                     {/* Header: Place name & matched field badge */}
                     <div className="flex flex-wrap items-center justify-between gap-2">
@@ -387,7 +492,7 @@ function SearchContent() {
 
                     {/* Original Devanagari Line */}
                     {passage.original_text && (
-                      <div className="p-3 rounded-md bg-sand-50/80 border border-line/70 font-devanagari text-xs sm:text-sm text-ink leading-relaxed whitespace-pre-line">
+                      <div className="p-3.5 rounded-control bg-sand-50/90 border border-line/70 font-devanagari text-xs sm:text-sm text-ink leading-relaxed whitespace-pre-line">
                         {highlightMatch(passage.original_text, query)}
                       </div>
                     )}

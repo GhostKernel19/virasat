@@ -76,10 +76,13 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-# Enable CORS for http://localhost:3000
+# Enable CORS for http://localhost:3000 and http://127.0.0.1:3000
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=[
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -458,11 +461,11 @@ def run_processing_pipeline(
 
         combined_text = f"{item_title} {original_text} {translated_text}".lower()
 
+        # Architecture site categories
         keyword_patterns = {
             "stepwell": [r"\bstepwell\b", r"\bvav\b", r"\bbaoli\b", r"पायविहीर", r"वाव", r"बावडी"],
             "fort": [r"\bfort\b", r"\bfortress\b", r"किल्ला", r"दुर्ग", r"गड"],
             "temple": [r"\btemple\b", r"मंदिर", r"देऊळ", r"विठ्ठल"],
-            "inscription": [r"\binscription\b", r"\bepigraphy\b", r"शिलालेख", r"दप्तर", r"दस्तऐवज"],
         }
 
         matched_tags: List[str] = []
@@ -472,8 +475,37 @@ def run_processing_pipeline(
                     matched_tags.append(tag_name)
                     break
 
-        if not matched_tags:
+        # Only tag 'inscription' when the text looks like an inscription
+        inscription_patterns = [
+            r"\binscription\b",
+            r"\bepigraphy\b",
+            r"शिलालेख",
+            r"संवत्",
+            r"संवत",
+            r"शके",
+            r"अभिलेख",
+        ]
+        is_inscription = any(re.search(pat, combined_text, re.IGNORECASE) for pat in inscription_patterns)
+
+        # Signboards / placards / notices get 'signage' tag
+        signage_patterns = [
+            r"\bsignboard\b",
+            r"\bsignage\b",
+            r"\bboard\b",
+            r"\bnotice\b",
+            r"पाटी",
+            r"सूचना",
+            r"फलक",
+            r"दिशादर्शक",
+            r"नामफलक",
+        ]
+        is_signage = any(re.search(pat, combined_text, re.IGNORECASE) for pat in signage_patterns)
+
+        if is_inscription:
             matched_tags.append("inscription")
+        elif is_signage:
+            matched_tags.append("signage")
+        # Other text gets no inscription tag
 
         for tag_name in matched_tags:
             tag_query = supabase.table("tags").select("id").eq("name", tag_name).execute()
@@ -515,12 +547,10 @@ def run_processing_pipeline(
 
         try:
             supabase.table("heritage_items").update({
-                "status": "needs_review"
-            }).eq("id", item_id).execute()
-        except Exception:
-            supabase.table("heritage_items").update({
                 "status": "in_review"
             }).eq("id", item_id).execute()
+        except Exception as e:
+            logger.error(f"Failed to update heritage_items status to in_review: {e}")
 
         finished_at = datetime.now(timezone.utc).isoformat()
         if finish_job_id:
@@ -887,12 +917,18 @@ def search(
         return {"places": [], "passages": []}
 
     query_str = q.strip()
-    safe_q = query_str.replace(",", " ").replace("%", "").strip()
+    safe_q = re.sub(r'[,()%"\']', ' ', query_str).strip()
+    safe_q = re.sub(r'\s+', ' ', safe_q)
     if not safe_q:
         return {"places": [], "passages": []}
 
     type_filter = type.strip() if type and type.strip() else None
+    if type_filter and type_filter.lower() in ["all", "all types", "all_types", "alltypes", "सर्व प्रकार"]:
+        type_filter = None
+
     state_filter = state.strip() if state and state.strip() else None
+    if state_filter and state_filter.lower() in ["all", "all states", "all_states", "सर्व राज्ये"]:
+        state_filter = None
 
     # Helper retry runner for Supabase queries
     def run_query(builder, retries=3):
@@ -932,13 +968,13 @@ def search(
         for p in places_rows[:20]
     ]
 
-    # 2. Search passages (ocr_texts and translations)
+    # 2. Search passages (ocr_texts and translations) - only published items appear in search
     passages_dict: Dict[str, Dict[str, Any]] = {}
 
     # 2a. Search ocr_texts.original_text
     ocr_builder = (
         supabase.table("ocr_texts")
-        .select("id, original_text, media(heritage_items(id, title, places(id, name, type, state))), translations(id, text)")
+        .select("id, original_text, media(heritage_items(id, title, status, places(id, name, type, state))), translations(id, text)")
         .ilike("original_text", f"%{safe_q}%")
     )
     ocr_res = run_query(ocr_builder.limit(40))
@@ -950,6 +986,12 @@ def search(
 
             media = row.get("media") or {}
             item = media.get("heritage_items") or {}
+            item_status = item.get("status") or ""
+
+            # Only published items appear in search
+            if item_status not in ["published", "verified"]:
+                continue
+
             place = item.get("places") or {}
 
             p_type = place.get("type") or ""
@@ -976,7 +1018,7 @@ def search(
     # 2b. Search translations.text
     trans_builder = (
         supabase.table("translations")
-        .select("id, text, ocr_id, ocr_texts(id, original_text, media(heritage_items(id, title, places(id, name, type, state)))))")
+        .select("id, text, ocr_id, ocr_texts(id, original_text, media(heritage_items(id, title, status, places(id, name, type, state)))))")
         .ilike("text", f"%{safe_q}%")
     )
     trans_res = run_query(trans_builder.limit(40))
@@ -989,6 +1031,12 @@ def search(
 
             media = ocr.get("media") or {}
             item = media.get("heritage_items") or {}
+            item_status = item.get("status") or ""
+
+            # Only published items appear in search
+            if item_status not in ["published", "verified"]:
+                continue
+
             place = item.get("places") or {}
 
             p_type = place.get("type") or ""
@@ -1019,4 +1067,44 @@ def search(
         "places": formatted_places,
         "passages": formatted_passages
     }
+
+
+@app.post("/items/{id}/approve")
+def approve_item(id: str):
+    """
+    Approve an item by setting its status to 'published'.
+    Only published items appear on place pages and in search.
+    """
+    check_item = supabase.table("heritage_items").select("id, status").eq("id", id).execute()
+    if not check_item.data:
+        raise HTTPException(status_code=404, detail="Heritage item not found.")
+
+    update_res = supabase.table("heritage_items").update({"status": "published"}).eq("id", id).execute()
+    if not update_res.data:
+        raise HTTPException(status_code=500, detail="Failed to approve item.")
+
+    return {
+        "id": id,
+        "status": "published",
+        "message": "Item approved and published successfully."
+    }
+
+
+@app.get("/admin/items")
+def get_admin_items(status: str = "in_review"):
+    """
+    List heritage items for the admin moderation page.
+    Defaults to status 'in_review'.
+    """
+    query = (
+        supabase.table("heritage_items")
+        .select("id, title, status, language, contributor, created_at, place_id, places(id, name, state, type), media(id, url, caption, ocr_texts(id, original_text, lines, translations(id, text)))")
+        .order("created_at", desc=True)
+    )
+    if status and status != "all":
+        query = query.eq("status", status)
+
+    res = query.execute()
+    return res.data or []
+
 

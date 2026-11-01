@@ -29,8 +29,8 @@ export function Navbar({ savedCount = 3 }: NavbarProps) {
       : `${savedCount}`;
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-sand/95 backdrop-blur-sm border-b border-line">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 py-3.5 flex items-center justify-between">
+    <header className="sticky top-0 z-50 w-full bg-sand/80 backdrop-blur-md border-b border-line shadow-xs">
+      <div className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-10 h-18 py-3.5 flex items-center justify-between">
         {/* Brand / Logo */}
         <Link
           href="/"
@@ -111,7 +111,7 @@ export function Navbar({ savedCount = 3 }: NavbarProps) {
         {/* Right Section: Language Toggle & Saved Count */}
         <div className="flex items-center gap-4 text-xs font-medium text-ink">
           {/* Language Switcher */}
-          <div className="flex items-center gap-1.5 select-none bg-sand-50/60 px-2 py-1 rounded border border-line/60">
+          <div className="flex items-center gap-1.5 select-none bg-sand-50/80 px-2.5 py-1 rounded-pill border border-line">
             <button
               type="button"
               onClick={() => setLanguage("en")}

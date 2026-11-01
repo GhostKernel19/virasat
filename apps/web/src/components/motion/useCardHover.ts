@@ -38,20 +38,20 @@ export function useCardHover<T extends HTMLElement = HTMLDivElement>(
     const ctx = gsap.context(() => {
       const handleMouseEnter = () => {
         gsap.to(el, {
-          scale,
-          boxShadow: `0 12px 28px -4px var(${glowColorVar}, rgba(198, 93, 59, 0.28)), 0 0 16px 2px var(${glowColorVar}, rgba(198, 93, 59, 0.2))`,
-          duration,
-          ease: "power2.out",
+          y: -4,
+          boxShadow: "0 24px 60px -20px rgba(46, 27, 16, 0.28)",
+          duration: 0.3,
+          ease: "cubic-bezier(0.22, 1, 0.36, 1)",
           overwrite: "auto",
         });
       };
 
       const handleMouseLeave = () => {
         gsap.to(el, {
-          scale: 1,
-          boxShadow: "0 0 0 0 rgba(0, 0, 0, 0)",
-          duration,
-          ease: "power2.out",
+          y: 0,
+          boxShadow: "0 10px 40px -12px rgba(46, 27, 16, 0.18)",
+          duration: 0.3,
+          ease: "cubic-bezier(0.22, 1, 0.36, 1)",
           overwrite: "auto",
         });
       };

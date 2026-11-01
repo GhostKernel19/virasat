@@ -125,11 +125,19 @@ export default function PlaceDetailPage({ params }: PlaceDetailPageProps) {
         if (!isMounted) return;
         setPlace(placeData);
 
-        // Fetch linked heritage items with media, OCR texts and translations
+        // Fetch linked heritage items with media, OCR texts and translations (only published items appear)
+        const isPreview =
+          typeof window !== "undefined" &&
+          new URLSearchParams(window.location.search).get("preview") === "all";
+        const allowedStatuses = isPreview
+          ? ["in_review", "published", "verified"]
+          : ["published", "verified"];
+
         const { data: itemsData, error: itemsError } = await supabase
           .from("heritage_items")
           .select("*, media(*, ocr_texts(*, translations(*)))")
           .eq("place_id", placeData.id)
+          .in("status", allowedStatuses)
           .order("created_at", { ascending: true });
 
         if (itemsError) {
@@ -193,7 +201,7 @@ export default function PlaceDetailPage({ params }: PlaceDetailPageProps) {
     <div className="min-h-screen flex flex-col bg-sand text-ink">
       <Navbar />
 
-      <main className="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="flex-1 max-w-5xl w-full mx-auto px-5 sm:px-8 lg:px-10 py-10">
         {/* Navigation Bar: Back to Explore and Cite button */}
         <div className="flex items-center justify-between gap-4 mb-6">
           <Link
@@ -209,7 +217,7 @@ export default function PlaceDetailPage({ params }: PlaceDetailPageProps) {
               type="button"
               onClick={handleCite}
               aria-label="Copy citation"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-line bg-white hover:bg-sand-50 text-xs font-medium text-ink transition-colors shadow-2xs cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-control border border-line bg-[#FAF7F2] hover:bg-[#FDFBF7] text-xs font-medium text-ink transition-all duration-300 ease-soft shadow-soft hover:shadow-lift hover:-translate-y-0.5 cursor-pointer"
             >
               {copied ? (
                 <Check className="w-3.5 h-3.5 text-green" />
@@ -231,7 +239,7 @@ export default function PlaceDetailPage({ params }: PlaceDetailPageProps) {
 
         {/* Error State */}
         {error && (
-          <div className="p-6 rounded-lg border border-red-200 bg-red-50/80 text-red-900 my-6">
+          <div className="p-6 rounded-card border border-red-200 bg-red-50/80 text-red-900 my-6 shadow-soft">
             <div className="flex items-center gap-2 mb-2">
               <AlertTriangle className="w-5 h-5 text-red-600 shrink-0" />
               <h3 className="font-semibold text-sm">Failed to Load Place Dossier</h3>
@@ -239,7 +247,7 @@ export default function PlaceDetailPage({ params }: PlaceDetailPageProps) {
             <p className="text-xs text-red-700 mb-4">{error}</p>
             <Link
               href="/explore"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-line bg-white text-xs font-medium text-ink hover:border-terracotta transition-colors"
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-control border border-line bg-[#FAF7F2] text-xs font-medium text-ink hover:border-terracotta transition-colors shadow-soft"
             >
               ← Back to Explore
             </Link>
@@ -250,7 +258,7 @@ export default function PlaceDetailPage({ params }: PlaceDetailPageProps) {
         {!loading && !error && place && (
           <div>
             {/* Place Metadata Card */}
-            <div className="bg-white/80 border border-line rounded-lg p-6 mb-8 shadow-2xs">
+            <div className="bg-[#FAF7F2] border border-line rounded-card p-8 mb-10 shadow-soft">
               <div className="flex flex-wrap items-center gap-2 mb-3">
                 {place.type && (
                   <Badge variant="terracotta" size="sm">
@@ -292,6 +300,11 @@ export default function PlaceDetailPage({ params }: PlaceDetailPageProps) {
                   </div>
                 )}
 
+                <div className="flex items-center gap-1.5">
+                  <FileText className="w-3.5 h-3.5 text-terracotta" />
+                  <span>{items.length} {items.length === 1 ? "record" : "records"}</span>
+                </div>
+
                 {typeof place.lat === "number" && typeof place.lng === "number" && (
                   <div className="text-ink/40 font-mono text-[11px]">
                     {place.lat.toFixed(4)}° N, {place.lng.toFixed(4)}° E
@@ -312,25 +325,26 @@ export default function PlaceDetailPage({ params }: PlaceDetailPageProps) {
               <div className="flex items-center gap-2">
                 <FileText className="w-4 h-4 text-terracotta" />
                 <h2 className="font-serif text-xl font-semibold text-ink">
-                  Archival Records & OCR Transcripts
+                  Archival Records & OCR Transcripts ({items.length})
                 </h2>
               </div>
 
               {items.length === 0 ? (
-                <div className="p-8 rounded-lg border border-dashed border-line bg-white/50 text-center text-ink/60 my-4">
-                  <p className="text-sm font-sans font-medium text-ink/80">No records yet</p>
+                <div className="p-10 rounded-card border border-dashed border-line bg-sand-50/80 text-center text-ink/60 my-4 shadow-soft">
+                  <p className="text-sm font-sans font-medium text-ink/80">No published records yet</p>
                   <p className="text-xs text-ink/50 mt-1">
-                    This place does not have any linked OCR records in the atlas.
+                    This place does not have any verified or published OCR records in the atlas.
                   </p>
                 </div>
               ) : (
                 items.map((item) => {
                   const ocrList = item.media?.flatMap((m) => m.ocr_texts || []) || [];
+                  const primaryMedia = item.media?.[0];
 
                   return (
                     <div
                       key={item.id}
-                      className="space-y-4 p-5 rounded-lg border border-line bg-white/60 shadow-2xs"
+                      className="space-y-5 p-6.5 rounded-card border border-line bg-[#FAF7F2] shadow-soft hover:shadow-lift hover:-translate-y-1 transition-all duration-300 ease-soft"
                     >
                       <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2 border-b border-line/70 pb-3">
                         <div>
@@ -350,23 +364,56 @@ export default function PlaceDetailPage({ params }: PlaceDetailPageProps) {
                         )}
                       </div>
 
+                      {/* Display primary media image if attached */}
+                      {primaryMedia?.url && (
+                        <div className="flex flex-col sm:flex-row gap-4 items-start pb-2">
+                          <div className="w-full sm:w-56 sm:h-40 shrink-0 rounded-control overflow-hidden border border-line bg-sand-100 shadow-soft">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img
+                              src={primaryMedia.url}
+                              alt={primaryMedia.caption || item.title}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                          {primaryMedia.caption && (
+                            <p className="text-xs text-ink/65 italic self-end sm:self-center">
+                              {primaryMedia.caption}
+                            </p>
+                          )}
+                        </div>
+                      )}
+
                       {ocrList.length === 0 ? (
                         <p className="text-xs text-ink/50 italic py-2">
                           No OCR transcripts attached to this item.
                         </p>
                       ) : (
                         ocrList.map((ocr) => {
-                          const lines = Array.isArray(ocr.lines) ? ocr.lines : [];
+                          const rawLines =
+                            Array.isArray(ocr.lines) && ocr.lines.length > 0
+                              ? ocr.lines
+                              : ocr.original_text
+                              ? ocr.original_text
+                              : [];
+
                           const translationText = ocr.translations?.[0]?.text || "";
                           const translationLines = splitTranslationLines(
                             translationText,
-                            lines.length
+                            rawLines.length
                           );
+
+                          if (rawLines.length === 0 && !translationText) {
+                            return (
+                              <p key={ocr.id} className="text-xs text-ink/50 italic py-2">
+                                OCR transcript pending or unavailable.
+                              </p>
+                            );
+                          }
 
                           return (
                             <div
                               key={ocr.id}
-                              className="border border-line rounded-lg overflow-hidden bg-white shadow-2xs"
+                              className="border border-line rounded-control overflow-hidden bg-[#FAF7F2] shadow-xs"
                             >
                               <div className="overflow-x-auto">
                                 <table className="w-full text-left border-collapse">
@@ -381,35 +428,46 @@ export default function PlaceDetailPage({ params }: PlaceDetailPageProps) {
                                     </tr>
                                   </thead>
                                   <tbody className="divide-y divide-line/60 text-sm">
-                                    {lines.map((line, idx) => {
-                                      const confidenceVal =
-                                        typeof line.confidence === "number"
-                                          ? line.confidence <= 1
-                                            ? (line.confidence * 100).toFixed(1) + "%"
-                                            : line.confidence.toFixed(1) + "%"
-                                          : null;
+                                    {rawLines.length > 0 ? (
+                                      rawLines.map((line, idx) => {
+                                        const confidenceVal =
+                                          typeof line.confidence === "number"
+                                            ? line.confidence <= 1
+                                              ? (line.confidence * 100).toFixed(1) + "%"
+                                              : line.confidence.toFixed(1) + "%"
+                                            : null;
 
-                                      return (
-                                        <tr
-                                          key={idx}
-                                          className="hover:bg-sand-50/50 transition-colors"
-                                        >
-                                          <td className="py-3 px-4 align-top font-devanagari text-[15px] leading-relaxed text-ink">
-                                            <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2">
-                                              <span>{line.text}</span>
-                                              {confidenceVal && (
-                                                <span className="shrink-0 text-[10px] font-mono px-1.5 py-0.5 rounded bg-sand-200/90 text-ink/70 border border-line/60">
-                                                  {confidenceVal}
-                                                </span>
-                                              )}
-                                            </div>
-                                          </td>
-                                          <td className="py-3 px-4 align-top font-sans text-xs text-ink/80 leading-relaxed">
-                                            {translationLines[idx] || translationText || "—"}
-                                          </td>
-                                        </tr>
-                                      );
-                                    })}
+                                        return (
+                                          <tr
+                                            key={idx}
+                                            className="hover:bg-sand-50/50 transition-colors"
+                                          >
+                                            <td className="py-3 px-4 align-top font-devanagari text-[15px] leading-relaxed text-ink">
+                                              <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2">
+                                                <span>{line.text}</span>
+                                                {confidenceVal && (
+                                                  <span className="shrink-0 text-[10px] font-mono px-2 py-0.5 rounded-pill bg-sand-200/90 text-ink/70 border border-line/60">
+                                                    {confidenceVal}
+                                                  </span>
+                                                )}
+                                              </div>
+                                            </td>
+                                            <td className="py-3 px-4 align-top font-sans text-xs text-ink/80 leading-relaxed">
+                                              {translationLines[idx] || translationText || "—"}
+                                            </td>
+                                          </tr>
+                                        );
+                                      })
+                                    ) : (
+                                      <tr>
+                                        <td className="py-3 px-4 align-top font-devanagari text-[15px] leading-relaxed text-ink">
+                                          {ocr.original_text || "—"}
+                                        </td>
+                                        <td className="py-3 px-4 align-top font-sans text-xs text-ink/80 leading-relaxed">
+                                          {translationText || "—"}
+                                        </td>
+                                      </tr>
+                                    )}
                                   </tbody>
                                 </table>
                               </div>

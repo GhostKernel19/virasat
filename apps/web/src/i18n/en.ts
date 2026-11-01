@@ -21,6 +21,7 @@ export interface TranslationDictionary {
       search: string;
       contribute: string;
       place: string;
+      admin: string;
     };
   };
   common: {
@@ -111,6 +112,20 @@ export interface TranslationDictionary {
       badge: string;
       back: string;
     };
+    admin: {
+      title: string;
+      subtitle: string;
+      badge: string;
+      filterInReview: string;
+      filterPublished: string;
+      filterAll: string;
+      approveBtn: string;
+      approvingBtn: string;
+      approvedBadge: string;
+      noItems: string;
+      loading: string;
+      viewPlace: string;
+    };
   };
 }
 
@@ -137,6 +152,7 @@ export const en: TranslationDictionary = {
       search: "02 / SEARCH",
       contribute: "03 / CONTRIBUTE",
       place: "04 / PLACE",
+      admin: "05 / ADMIN",
     },
   },
   common: {
@@ -226,6 +242,20 @@ export const en: TranslationDictionary = {
       subtitle: "Archival dossier, spatial coordinates, structural taxonomy, and source documents.",
       badge: "HERITAGE RECORD",
       back: "Back to Explore Atlas",
+    },
+    admin: {
+      title: "Archive Moderation Queue",
+      subtitle: "Review community-submitted records, inspect OCR transcripts, and approve them for publication.",
+      badge: "ADMIN MODERATION",
+      filterInReview: "In Review",
+      filterPublished: "Published",
+      filterAll: "All Records",
+      approveBtn: "Approve for Publication",
+      approvingBtn: "Approving...",
+      approvedBadge: "Published",
+      noItems: "No items matching this status.",
+      loading: "Loading moderation items...",
+      viewPlace: "View Place Dossier",
     },
   },
 };
