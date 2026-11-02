@@ -1,13 +1,19 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import Link from "next/link";
-import { Navbar, Footer, Button, Chip, PlaceCard } from "@/components";
+import { Navbar, Footer, Button } from "@/components";
 import { BirdFlock, isReducedMotion } from "@/components/motion";
 import { useLanguage } from "@/i18n";
-import { ArrowDown, ArrowRight } from "lucide-react";
-import { fetchPlacesFromSupabase, FALLBACK_PLACES } from "@/lib/places";
-import { Place } from "@/types/place";
+import {
+  ArrowDown,
+  ArrowRight,
+  Compass,
+  BookOpen,
+  Search,
+  UploadCloud,
+  CheckCircle2,
+} from "lucide-react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
@@ -16,8 +22,7 @@ if (typeof window !== "undefined") {
 }
 
 export default function HomePage() {
-  const { language, t } = useLanguage();
-  const [places, setPlaces] = useState<Place[]>(FALLBACK_PLACES);
+  const { t } = useLanguage();
 
   // Animation references
   const heroBgRef = useRef<HTMLImageElement | null>(null);
@@ -25,37 +30,17 @@ export default function HomePage() {
   const haze2Ref = useRef<HTMLDivElement | null>(null);
   const primaryBtnRef = useRef<HTMLButtonElement | null>(null);
   const coverContentRef = useRef<HTMLDivElement | null>(null);
-  const section2Ref = useRef<HTMLElement | null>(null);
-  const cardsRowRef = useRef<HTMLDivElement | null>(null);
+  const guideRef = useRef<HTMLElement | null>(null);
 
-  // 1. Fetch real places and counts from Supabase
-  useEffect(() => {
-    let isSubscribed = true;
-    async function loadPlaces() {
-      try {
-        const data = await fetchPlacesFromSupabase();
-        if (isSubscribed && data && data.length > 0) {
-          setPlaces(data);
-        }
-      } catch (err) {
-        console.warn("Failed to load places for landing page:", err);
-      }
-    }
-    loadPlaces();
-    return () => {
-      isSubscribed = false;
-    };
-  }, []);
-
-  // 2. Smooth-scroll helper to Section 2
-  const scrollToSection2 = () => {
-    const el = document.getElementById("intro-section");
+  // Smooth-scroll helper to Guide section
+  const scrollToGuide = () => {
+    const el = document.getElementById("guide");
     if (el) {
       el.scrollIntoView({ behavior: "smooth" });
     }
   };
 
-  // 3. GSAP animations and lifecycle handling
+  // GSAP animations and lifecycle handling
   useEffect(() => {
     const reduced = isReducedMotion();
     const activeTweens: (gsap.core.Tween | gsap.core.Timeline)[] = [];
@@ -112,7 +97,7 @@ export default function HomePage() {
         activeTweens.push(pulseTween);
       }
 
-      // Cover items entrance: fade up with 120ms stagger
+      // Cover items entrance: animate opacity and translateY on element itself (no mask reveal)
       if (coverContentRef.current) {
         const coverItems = coverContentRef.current.querySelectorAll(".cover-animate-item");
         if (coverItems.length > 0) {
@@ -132,27 +117,27 @@ export default function HomePage() {
         }
       }
 
-      // Section 2 cards entrance: fade up on scroll with 80ms stagger
-      if (cardsRowRef.current) {
-        const cards = cardsRowRef.current.querySelectorAll(".glass-card-item");
-        if (cards.length > 0) {
+      // Guide section entrance: fade-up on scroll with ScrollTrigger (80ms stagger)
+      if (guideRef.current) {
+        const guideItems = guideRef.current.querySelectorAll(".guide-animate-item");
+        if (guideItems.length > 0) {
           if (reduced) {
             gsap.fromTo(
-              cards,
+              guideItems,
               { opacity: 0 },
               {
                 opacity: 1,
                 duration: 0.5,
                 stagger: 0.08,
                 scrollTrigger: {
-                  trigger: cardsRowRef.current,
-                  start: "top 85%",
+                  trigger: guideRef.current,
+                  start: "top 80%",
                 },
               }
             );
           } else {
             gsap.fromTo(
-              cards,
+              guideItems,
               { opacity: 0, y: 24 },
               {
                 opacity: 1,
@@ -161,8 +146,8 @@ export default function HomePage() {
                 stagger: 0.08,
                 ease: "power2.out",
                 scrollTrigger: {
-                  trigger: cardsRowRef.current,
-                  start: "top 85%",
+                  trigger: guideRef.current,
+                  start: "top 80%",
                 },
               }
             );
@@ -188,28 +173,12 @@ export default function HomePage() {
     };
   }, []);
 
-  // Calculate real counts with fallbacks
-  const placesCount = places.length || 4;
-  const recordsCount = places.reduce((acc, p) => acc + (p.recordsCount || 0), 0) || 60;
-
-  const formatNumber = (num: number) => {
-    if (language === "mr") {
-      const devanagariDigits = ["०", "१", "२", "३", "४", "५", "६", "७", "८", "९"];
-      const str = num < 10 ? `0${num}` : `${num}`;
-      return str.split("").map((d) => devanagariDigits[parseInt(d, 10)] ?? d).join("");
-    }
-    return num < 10 ? `0${num}` : `${num}`;
-  };
-
-  const formattedPlacesCount = formatNumber(placesCount);
-  const formattedRecordsCount = formatNumber(recordsCount);
-
   return (
     <div className="min-h-screen flex flex-col text-text bg-bg-0">
       <Navbar />
 
       {/* SECTION 1: COVER (100vh) */}
-      <section className="relative min-h-screen w-full overflow-hidden isolate flex flex-col justify-between items-center text-center px-4 sm:px-8 select-none">
+      <section className="relative min-h-screen w-full isolate flex flex-col justify-between items-center text-center px-4 sm:px-8 select-none">
         {/* Background image with Ken Burns slow zoom (GSAP): hero.webp only */}
         <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -221,7 +190,7 @@ export default function HomePage() {
           />
         </div>
 
-        {/* Overlay: linear-gradient(to bottom, rgba(21,9,4,0.55), rgba(21,9,4,0.35) 40%, rgba(21,9,4,0.8)) plus radial darkening behind text */}
+        {/* Overlay: linear-gradient plus radial darkening behind text */}
         <div
           aria-hidden="true"
           className="absolute inset-0 z-[1] pointer-events-none"
@@ -296,16 +265,19 @@ export default function HomePage() {
             </svg>
           </div>
 
-          {/* 16px gap -> then Marathi wordmark विरासत (clamp 56 to 88px, line-height 1.2 with enough top padding so headline stroke is not clipped) */}
+          {/* 16px gap -> Marathi wordmark: line-height 1.45, padding-top 0.25em, padding-bottom 0.1em, inline-block, font stack */}
           <div
-            className="cover-animate-item pt-2 sm:pt-3"
+            className="cover-animate-item"
             style={{ marginTop: 16 }}
           >
             <span
-              className="font-devanagari-heading font-bold bg-gradient-to-r from-[#F7C9A3] via-[#E8834A] to-[#C65D3B] bg-clip-text text-transparent block select-none"
+              className="font-devanagari-heading font-bold bg-gradient-to-r from-[#F7C9A3] via-[#E8834A] to-[#C65D3B] bg-clip-text text-transparent inline-block select-none"
               style={{
+                fontFamily: "'Noto Serif Devanagari', 'Tiro Devanagari Marathi', serif",
                 fontSize: "clamp(56px, 6vw, 88px)",
-                lineHeight: 1.2,
+                lineHeight: 1.45,
+                paddingTop: "0.25em",
+                paddingBottom: "0.1em",
               }}
             >
               विरासत
@@ -385,7 +357,7 @@ export default function HomePage() {
               size="lg"
               className="text-[15px] sm:text-base font-medium shadow-glow"
               iconRight={<ArrowDown className="w-4 h-4" />}
-              onClick={scrollToSection2}
+              onClick={scrollToGuide}
             >
               {t.routes.home.ctaEnterAtlas}
             </Button>
@@ -402,7 +374,7 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Bottom bar on a dark gradient strip so it is readable */}
+        {/* Bottom bar on a dark gradient strip */}
         <div className="relative z-20 w-full bg-gradient-to-t from-bg-0 via-bg-0/90 to-transparent pt-10 pb-6 mt-auto">
           <div className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-10 flex items-center justify-between text-xs tracking-widest uppercase text-text/75 font-medium">
             <div className="hidden sm:block">
@@ -411,7 +383,7 @@ export default function HomePage() {
 
             <button
               type="button"
-              onClick={scrollToSection2}
+              onClick={scrollToGuide}
               className="mx-auto sm:mx-0 flex items-center gap-2 text-text/75 hover:text-accent transition-colors cursor-pointer group"
               aria-label={t.routes.home.scrollToDiscover}
             >
@@ -424,107 +396,206 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* SECTION 2: INTRO */}
+      {/* SECTION 2: GUIDE (id="guide") */}
       <section
-        id="intro-section"
-        ref={section2Ref}
-        className="relative z-10 max-w-7xl w-full mx-auto px-5 sm:px-8 lg:px-10 py-24 flex flex-col gap-12"
+        id="guide"
+        ref={guideRef}
+        className="relative z-10 max-w-5xl w-full mx-auto px-5 sm:px-8 lg:px-10 py-24 flex flex-col gap-16"
       >
-        {/* Intro Header & Stats */}
-        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 pb-4 border-b border-border/40">
-          {/* Left Column */}
-          <div className="max-w-2xl">
-            <p className="text-xs font-bold tracking-[0.25em] text-accent uppercase mb-3">
-              {t.routes.home.introLabel}
-            </p>
-            <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-normal text-text leading-tight mb-4">
-              {t.routes.home.introTitle}
-            </h2>
-            <p className="text-sm sm:text-base text-text-muted leading-relaxed mb-6">
-              {t.routes.home.introParagraph}
-            </p>
+        {/* a) Heading "What is Virasat?" */}
+        <div className="guide-animate-item text-center max-w-3xl mx-auto">
+          <span className="text-[11px] font-bold tracking-[0.25em] text-accent uppercase mb-3 block">
+            {t.routes.home.guide.badge}
+          </span>
+          <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-normal text-text leading-tight mb-5">
+            {t.routes.home.guide.whatIsTitle}
+          </h2>
+          <p className="text-base sm:text-lg text-text-muted leading-relaxed font-sans">
+            {t.routes.home.guide.whatIsParagraph}
+          </p>
+        </div>
 
-            {/* Pill Filter Chips linking to /explore */}
-            <div className="flex flex-wrap items-center gap-2.5">
-              <Link href="/explore">
-                <Chip active>{t.common.all}</Chip>
-              </Link>
-              <Link href="/explore?filter=ocr">
-                <Chip>{t.common.hasOcr}</Chip>
-              </Link>
-              <Link href="/explore?type=Stepwell">
-                <Chip>{t.common.stepwells}</Chip>
-              </Link>
-              <Link href="/explore?type=Fort">
-                <Chip>{t.common.forts}</Chip>
-              </Link>
-            </div>
+        {/* b) "The problem": three short lines */}
+        <div className="guide-animate-item glass p-7 sm:p-9 rounded-card shadow-soft">
+          <div className="flex items-center gap-2 mb-6 pb-3 border-b border-border/50">
+            <span className="w-2 h-2 rounded-full bg-accent animate-pulse" />
+            <h3 className="text-xs font-bold tracking-widest text-accent uppercase">
+              {t.routes.home.guide.problemTitle}
+            </h3>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {t.routes.home.guide.problemPoints.map((point, i) => (
+              <div key={i} className="flex items-start gap-3.5">
+                <span className="font-mono text-xs text-accent-strong font-bold shrink-0 mt-0.5">
+                  0{i + 1}.
+                </span>
+                <p className="text-sm sm:text-base text-text/90 font-medium leading-snug">
+                  {point}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* c) "What it does": four glass cards with line icons */}
+        <div className="guide-animate-item space-y-6">
+          <div className="text-center sm:text-left">
+            <span className="text-xs font-bold tracking-widest text-accent uppercase mb-2 block">
+              {t.routes.home.guide.whatItDoesBadge}
+            </span>
+            <h3 className="font-serif text-2xl sm:text-3xl font-normal text-text">
+              {t.routes.home.guide.whatItDoesTitle}
+            </h3>
           </div>
 
-          {/* Right Column: Stats Block */}
-          <div className="flex items-center gap-8 self-start lg:self-end shrink-0 pt-2 lg:pt-0">
-            <div>
-              <span className="font-serif text-4xl sm:text-5xl text-accent font-normal block leading-none">
-                {formattedPlacesCount}
-              </span>
-              <span className="text-[11px] font-mono tracking-widest text-text-muted uppercase mt-2 block">
-                {t.common.placesMapped}
-              </span>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            {/* Card 1: Map every place */}
+            <div className="glass p-6 sm:p-7 rounded-card shadow-soft hover:shadow-lift hover:-translate-y-1 transition-all duration-300 ease-soft flex flex-col justify-between group">
+              <div>
+                <div className="w-11 h-11 rounded-pill bg-surface-solid border border-border flex items-center justify-center text-accent mb-4 group-hover:border-accent transition-colors shadow-soft">
+                  <Compass className="w-5 h-5" />
+                </div>
+                <h4 className="font-serif text-lg sm:text-xl font-medium text-text mb-2 group-hover:text-accent transition-colors">
+                  {t.routes.home.guide.cards.mapTitle}
+                </h4>
+                <p className="text-xs sm:text-sm text-text-muted leading-relaxed">
+                  {t.routes.home.guide.cards.mapDesc}
+                </p>
+              </div>
             </div>
-            <div className="h-12 w-px bg-border/40" />
-            <div>
-              <span className="font-serif text-4xl sm:text-5xl text-accent font-normal block leading-none">
-                {formattedRecordsCount}
-              </span>
-              <span className="text-[11px] font-mono tracking-widest text-text-muted uppercase mt-2 block">
-                {t.common.linkedRecords}
-              </span>
+
+            {/* Card 2: Read every record */}
+            <div className="glass p-6 sm:p-7 rounded-card shadow-soft hover:shadow-lift hover:-translate-y-1 transition-all duration-300 ease-soft flex flex-col justify-between group">
+              <div>
+                <div className="w-11 h-11 rounded-pill bg-surface-solid border border-border flex items-center justify-center text-accent mb-4 group-hover:border-accent transition-colors shadow-soft">
+                  <BookOpen className="w-5 h-5" />
+                </div>
+                <h4 className="font-serif text-lg sm:text-xl font-medium text-text mb-2 group-hover:text-accent transition-colors">
+                  {t.routes.home.guide.cards.readTitle}
+                </h4>
+                <p className="text-xs sm:text-sm text-text-muted leading-relaxed">
+                  {t.routes.home.guide.cards.readDesc}
+                </p>
+              </div>
+            </div>
+
+            {/* Card 3: Search inside records */}
+            <div className="glass p-6 sm:p-7 rounded-card shadow-soft hover:shadow-lift hover:-translate-y-1 transition-all duration-300 ease-soft flex flex-col justify-between group">
+              <div>
+                <div className="w-11 h-11 rounded-pill bg-surface-solid border border-border flex items-center justify-center text-accent mb-4 group-hover:border-accent transition-colors shadow-soft">
+                  <Search className="w-5 h-5" />
+                </div>
+                <h4 className="font-serif text-lg sm:text-xl font-medium text-text mb-2 group-hover:text-accent transition-colors">
+                  {t.routes.home.guide.cards.searchTitle}
+                </h4>
+                <p className="text-xs sm:text-sm text-text-muted leading-relaxed">
+                  {t.routes.home.guide.cards.searchDesc}
+                </p>
+              </div>
+            </div>
+
+            {/* Card 4: Contribute a source */}
+            <div className="glass p-6 sm:p-7 rounded-card shadow-soft hover:shadow-lift hover:-translate-y-1 transition-all duration-300 ease-soft flex flex-col justify-between group">
+              <div>
+                <div className="w-11 h-11 rounded-pill bg-surface-solid border border-border flex items-center justify-center text-accent mb-4 group-hover:border-accent transition-colors shadow-soft">
+                  <UploadCloud className="w-5 h-5" />
+                </div>
+                <h4 className="font-serif text-lg sm:text-xl font-medium text-text mb-2 group-hover:text-accent transition-colors">
+                  {t.routes.home.guide.cards.contributeTitle}
+                </h4>
+                <p className="text-xs sm:text-sm text-text-muted leading-relaxed">
+                  {t.routes.home.guide.cards.contributeDesc}
+                </p>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Row of 3 Glass Cards for the first three places */}
-        <div
-          ref={cardsRowRef}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"
-        >
-          {places.slice(0, 3).map((place, idx) => (
-            <PlaceCard
-              key={place.id}
-              id={place.slug || place.id}
-              title={place.name}
-              marathiTitle={place.marathiName}
-              location={`${place.region ? place.region + ", " : ""}${place.state}`}
-              century={place.period}
-              category={place.category}
-              imageUrl={place.imageUrl || ""}
-              hasOcr={place.hasOcr}
-              recordsCount={place.recordsCount || 0}
-              isIllustrative={place.isIllustrative !== false}
-              isSelected={idx === 0}
-              href={`/place/${place.slug || place.id}`}
-              className="glass-card-item"
+        {/* d) "How it works": three numbered steps with connecting line */}
+        <div className="guide-animate-item glass p-8 sm:p-10 rounded-card shadow-soft">
+          <div className="text-center mb-10">
+            <span className="text-xs font-bold tracking-widest text-accent uppercase mb-2 block">
+              {t.routes.home.guide.howItWorksBadge}
+            </span>
+            <h3 className="font-serif text-2xl sm:text-3xl font-normal text-text">
+              {t.routes.home.guide.howItWorksTitle}
+            </h3>
+          </div>
+
+          <div className="relative grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-6 mb-8">
+            {/* Desktop horizontal connecting hairline */}
+            <div
+              aria-hidden="true"
+              className="hidden md:block absolute top-6 left-16 right-16 h-[2px] bg-gradient-to-r from-accent/20 via-accent/60 to-accent/20 z-0"
             />
-          ))}
-        </div>
 
-        {/* Glass Strip with quote and contribution callout */}
-        <div className="p-5 sm:p-6 glass shadow-soft flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <span className="text-accent text-lg shrink-0">✦</span>
-            <p className="text-xs sm:text-sm text-text-muted font-serif italic">
-              &quot;{t.common.quoteBanner}&quot;
+            {t.routes.home.guide.steps.map((step, idx) => (
+              <div
+                key={idx}
+                className="relative z-10 flex flex-col items-center text-center"
+              >
+                <div className="w-12 h-12 rounded-full bg-surface-solid border-2 border-accent text-accent font-serif font-bold text-lg flex items-center justify-center shadow-glow mb-4">
+                  {step.step}
+                </div>
+                <h4 className="font-serif text-base sm:text-lg font-medium text-text leading-snug max-w-[240px]">
+                  {step.title}
+                </h4>
+              </div>
+            ))}
+          </div>
+
+          <div className="pt-5 border-t border-border/40 text-center">
+            <p className="text-xs text-text-muted italic flex items-center justify-center gap-1.5">
+              <CheckCircle2 className="w-3.5 h-3.5 text-accent shrink-0" />
+              <span>{t.routes.home.guide.aiNote}</span>
             </p>
           </div>
-          <Link href="/contribute" className="shrink-0">
-            <Button
-              variant="link"
-              size="sm"
-              iconRight={<ArrowRight className="w-3.5 h-3.5" />}
-            >
-              {t.routes.home.addToAtlasAction}
-            </Button>
-          </Link>
+        </div>
+
+        {/* e) "Who it is for": four small pills */}
+        <div className="guide-animate-item flex flex-col items-center text-center gap-4">
+          <span className="text-xs font-bold tracking-widest text-text-muted uppercase">
+            {t.routes.home.guide.whoItIsForTitle}
+          </span>
+          <div className="flex flex-wrap items-center justify-center gap-2.5">
+            {t.routes.home.guide.pills.map((pill, i) => (
+              <span
+                key={i}
+                className="px-4 py-2 rounded-pill bg-[rgba(21,9,4,0.45)] backdrop-blur-[10px] border border-[rgba(245,230,211,0.22)] text-xs sm:text-sm font-medium text-text shadow-soft"
+              >
+                {pill}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        {/* f) Closing strip: "Ready to explore?" */}
+        <div className="guide-animate-item p-7 sm:p-9 glass rounded-card shadow-soft flex flex-col sm:flex-row items-center justify-between gap-6">
+          <div>
+            <h3 className="font-serif text-2xl sm:text-3xl font-normal text-text mb-1">
+              {t.routes.home.guide.readyTitle}
+            </h3>
+            <p className="text-xs sm:text-sm text-text-muted">
+              {t.routes.home.guide.readySubtitle}
+            </p>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-3.5 shrink-0">
+            <Link href="/explore">
+              <Button
+                variant="primary"
+                size="md"
+                iconRight={<ArrowRight className="w-4 h-4" />}
+              >
+                {t.routes.home.ctaExploreMap}
+              </Button>
+            </Link>
+            <Link href="/contribute">
+              <Button variant="secondary" size="md">
+                {t.routes.home.ctaContributeRecord}
+              </Button>
+            </Link>
+          </div>
         </div>
       </section>
 

@@ -6,6 +6,7 @@ export interface TranslationDictionary {
     sublabel: string;
   };
   nav: {
+    home: string;
     explore: string;
     search: string;
     contribute: string;
@@ -61,6 +62,36 @@ export interface TranslationDictionary {
       introTitle: string;
       introParagraph: string;
       addToAtlasAction: string;
+      guide: {
+        badge: string;
+        whatIsTitle: string;
+        whatIsParagraph: string;
+        problemTitle: string;
+        problemPoints: string[];
+        whatItDoesBadge: string;
+        whatItDoesTitle: string;
+        cards: {
+          mapTitle: string;
+          mapDesc: string;
+          readTitle: string;
+          readDesc: string;
+          searchTitle: string;
+          searchDesc: string;
+          contributeTitle: string;
+          contributeDesc: string;
+        };
+        howItWorksBadge: string;
+        howItWorksTitle: string;
+        steps: Array<{
+          step: number;
+          title: string;
+        }>;
+        aiNote: string;
+        whoItIsForTitle: string;
+        pills: string[];
+        readyTitle: string;
+        readySubtitle: string;
+      };
     };
     explore: {
       title: string;
@@ -150,6 +181,7 @@ export const en: TranslationDictionary = {
     sublabel: "A LIVING HERITAGE ATLAS",
   },
   nav: {
+    home: "Home",
     explore: "Explore",
     search: "Search",
     contribute: "Contribute",
@@ -205,6 +237,42 @@ export const en: TranslationDictionary = {
       introTitle: "From archival graveyard to living heritage map",
       introParagraph: "Follow a place from stone to story. Explore monuments, read records, and add what you know.",
       addToAtlasAction: "Add to the atlas →",
+      guide: {
+        badge: "ATLAS GUIDE & ARCHITECTURE",
+        whatIsTitle: "What is Virasat?",
+        whatIsParagraph:
+          "Virasat turns scattered heritage documentation into a living, searchable map. Field photos, scanned pages and handwritten notes stop sitting in folders and become places you can explore, records you can read and words you can search.",
+        problemTitle: "The problem",
+        problemPoints: [
+          "Records sit in disconnected folders.",
+          "Scans in regional scripts can't be searched.",
+          "Places and their documents are never linked.",
+        ],
+        whatItDoesBadge: "CAPABILITIES",
+        whatItDoesTitle: "What it does",
+        cards: {
+          mapTitle: "Map every place",
+          mapDesc: "explore monuments on an interactive atlas",
+          readTitle: "Read every record",
+          readDesc: "the scan, its Devanagari transcript and the English translation side by side",
+          searchTitle: "Search inside records",
+          searchDesc: "find words across places and OCR text, in English and Devanagari",
+          contributeTitle: "Contribute a source",
+          contributeDesc: "upload a photo or document and let AI do the first pass",
+        },
+        howItWorksBadge: "PIPELINE WORKFLOW",
+        howItWorksTitle: "How it works",
+        steps: [
+          { step: 1, title: "Upload a photo or scan" },
+          { step: 2, title: "AI reads and translates it" },
+          { step: 3, title: "It joins the map and becomes searchable" },
+        ],
+        aiNote: "AI output is a starting point; you can correct every field.",
+        whoItIsForTitle: "Who it is for",
+        pills: ["Researchers", "Students", "Heritage travellers", "Archivists"],
+        readyTitle: "Ready to explore?",
+        readySubtitle: "Discover historical monuments across India or contribute your own field records.",
+      },
     },
     explore: {
       title: "Living Heritage Atlas — Spatial Discovery",

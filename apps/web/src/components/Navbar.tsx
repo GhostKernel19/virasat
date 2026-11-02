@@ -18,9 +18,26 @@ export function Navbar({ savedCount = 3 }: NavbarProps) {
   const { language, t } = useLanguage();
 
   const navLinks = [
-    { href: "/explore", label: t.nav.explore, match: (p: string) => Boolean(p && (p.startsWith("/explore") || p === "/")) },
-    { href: "/search", label: t.nav.search, match: (p: string) => Boolean(p && p.startsWith("/search")) },
-    { href: "/contribute", label: t.nav.contribute, match: (p: string) => Boolean(p && p.startsWith("/contribute")) },
+    {
+      href: "/",
+      label: t.nav.home,
+      match: (p: string) => p === "/",
+    },
+    {
+      href: "/explore",
+      label: t.nav.explore,
+      match: (p: string) => Boolean(p && p.startsWith("/explore")),
+    },
+    {
+      href: "/search",
+      label: t.nav.search,
+      match: (p: string) => Boolean(p && p.startsWith("/search")),
+    },
+    {
+      href: "/contribute",
+      label: t.nav.contribute,
+      match: (p: string) => Boolean(p && p.startsWith("/contribute")),
+    },
   ];
 
   const formattedSavedCount =
@@ -32,9 +49,12 @@ export function Navbar({ savedCount = 3 }: NavbarProps) {
 
   return (
     <>
-      <header className="fixed top-0 left-0 right-0 z-50 w-full bg-surface/85 backdrop-blur-[14px] border-b border-border/20">
+      <header
+        className="fixed top-0 left-0 right-0 z-50 w-full bg-surface/85 backdrop-blur-[14px]"
+        style={{ borderBottom: "1px solid rgba(245, 230, 211, 0.12)" }}
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-10 h-16 flex items-center justify-between gap-3 sm:gap-6">
-          {/* Brand / Logo (shrink-0 to prevent overlap) */}
+          {/* Brand / Logo (shrink-0 to prevent overlap, links to "/") */}
           <Link
             href="/"
             className="flex items-center gap-2 sm:gap-2.5 group no-underline select-none shrink-0"
@@ -73,7 +93,15 @@ export function Navbar({ savedCount = 3 }: NavbarProps) {
               </svg>
             </div>
 
-            <span className="font-devanagari-heading text-xl sm:text-2xl font-bold tracking-tight text-accent leading-none">
+            <span
+              className="font-devanagari-heading text-xl sm:text-2xl font-bold tracking-tight text-accent inline-block select-none"
+              style={{
+                fontFamily: "'Noto Serif Devanagari', 'Tiro Devanagari Marathi', serif",
+                lineHeight: 1.45,
+                paddingTop: "0.25em",
+                paddingBottom: "0.1em",
+              }}
+            >
               विरासत
             </span>
           </Link>
