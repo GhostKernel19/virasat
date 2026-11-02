@@ -78,28 +78,34 @@ export function MapExplorer({
         const halo = element.querySelector<HTMLElement>(".pin-halo");
 
         if (isSelected) {
-          element.style.transform = "scale(1.32) translateY(-4px)";
+          element.classList.add("is-selected");
+          element.style.transform = "";
           element.style.zIndex = "40";
-          if (svgPath) svgPath.setAttribute("fill", "var(--accent-strong)");
-          if (halo) {
-            halo.style.opacity = "1";
-            halo.style.boxShadow = "var(--glow)";
-          }
-        } else if (isHovered) {
-          element.style.transform = "scale(1.24) translateY(-2px)";
-          element.style.zIndex = "30";
           if (svgPath) svgPath.setAttribute("fill", "var(--accent)");
           if (halo) {
             halo.style.opacity = "1";
+            halo.style.boxShadow = "var(--glow)";
+            halo.classList.add("virasat-pin-halo-pulse");
+          }
+        } else if (isHovered) {
+          element.classList.remove("is-selected");
+          element.style.transform = "scale(1.24) translateY(-2px)";
+          element.style.zIndex = "30";
+          if (svgPath) svgPath.setAttribute("fill", "var(--accent-strong)");
+          if (halo) {
+            halo.style.opacity = "1";
             halo.style.boxShadow = "var(--glow-sm)";
+            halo.classList.remove("virasat-pin-halo-pulse");
           }
         } else {
+          element.classList.remove("is-selected");
           element.style.transform = "scale(1) translateY(0)";
           element.style.zIndex = "10";
           if (svgPath) svgPath.setAttribute("fill", "var(--accent)");
           if (halo) {
             halo.style.opacity = "0";
             halo.style.boxShadow = "none";
+            halo.classList.remove("virasat-pin-halo-pulse");
           }
         }
       });
@@ -203,7 +209,7 @@ export function MapExplorer({
             <path d="M12 20.5V16C12 13.24 14.24 11 17 11C19.76 11 22 13.24 22 16V20.5" stroke="var(--bg-0)" stroke-width="2" stroke-linecap="round"/>
             <line x1="12" y1="20.5" x2="22" y2="20.5" stroke="var(--bg-0)" stroke-width="2"/>
           </svg>
-          <div class="pin-halo absolute -inset-2 rounded-full pointer-events-none opacity-0 transition-opacity duration-200"></div>
+          <div class="pin-halo absolute -inset-2.5 rounded-full pointer-events-none opacity-0 transition-opacity duration-300 bg-accent/25"></div>
         </div>
       `;
 
@@ -264,7 +270,10 @@ export function MapExplorer({
       : selectedPlace?.name;
 
   return (
-    <div className={`relative w-full h-full overflow-hidden rounded-xl border border-line ${className}`}>
+    <div
+      className={`relative w-full h-full overflow-hidden rounded-[20px] glass border border-border shadow-soft ${className}`}
+      style={{ borderRadius: "20px" }}
+    >
       {/* Map clip-path unfold animation */}
       <motion.div
         initial={
@@ -274,9 +283,9 @@ export function MapExplorer({
         }
         animate={{ opacity: 1, clipPath: "polygon(0 0, 100% 0, 100% 100%, 0 100%)" }}
         transition={{ duration: shouldReduceMotion ? 0 : 0.85, ease: [0.16, 1, 0.3, 1] }}
-        className="w-full h-full"
+        className="w-full h-full rounded-[20px] overflow-hidden"
       >
-        <div ref={mapContainerRef} className="w-full h-full bg-bg-1" />
+        <div ref={mapContainerRef} className="w-full h-full bg-bg-1 rounded-[20px] overflow-hidden" />
       </motion.div>
 
       {/* Map watermark / badge */}
@@ -298,7 +307,7 @@ export function MapExplorer({
             transition={{ duration: shouldReduceMotion ? 0 : 0.28, ease: "easeOut" }}
             className="absolute bottom-4 left-4 right-4 z-20"
           >
-            <div className="p-5.5 glass shadow-soft text-text">
+            <div className="p-5.5 glass shadow-soft text-text rounded-card border border-border/80">
               {/* Panel Top Bar */}
               <div className="flex items-center justify-between pb-2 mb-3 border-b border-border/70">
                 <div className="flex items-center gap-2">
