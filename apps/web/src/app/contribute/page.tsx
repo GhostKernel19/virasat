@@ -288,8 +288,16 @@ export default function ContributePage() {
     } catch (err: unknown) {
       stopPolling();
       setIsProcessing(false);
-      const message =
+      let message =
         err instanceof Error ? err.message : "Failed to submit heritage record to API.";
+      if (
+        message === "Failed to fetch" ||
+        message.toLowerCase().includes("failed to fetch") ||
+        message.toLowerCase().includes("networkerror") ||
+        message.toLowerCase().includes("load failed")
+      ) {
+        message = `Could not reach the API at ${API_URL}. Is the backend running?`;
+      }
       setSubmitError(message);
     }
   };
@@ -501,15 +509,33 @@ export default function ContributePage() {
                   value={selectedPlaceId}
                   disabled={isProcessing || loadingPlaces}
                   onChange={(e) => setSelectedPlaceId(e.target.value)}
-                  className="w-full px-4 py-2.5 text-sm bg-surface-solid/80 border border-border rounded-control focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent text-text disabled:opacity-50 transition-all duration-300 ease-soft"
+                  className="w-full px-4 py-2.5 text-sm rounded-control border border-border focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent disabled:opacity-50 transition-all duration-300 ease-soft [color-scheme:dark]"
+                  style={{
+                    backgroundColor: "#2A1A10",
+                    color: "#F5E6D3",
+                    colorScheme: "dark",
+                  }}
                 >
-                  <option value="">
+                  <option
+                    value=""
+                    style={{
+                      backgroundColor: "#2A1A10",
+                      color: "rgba(245, 230, 211, 0.88)",
+                    }}
+                  >
                     {loadingPlaces
                       ? t.routes.contribute.loadingPlaces
                       : t.routes.contribute.selectPlacePrompt}
                   </option>
                   {places.map((place) => (
-                    <option key={place.id} value={place.id}>
+                    <option
+                      key={place.id}
+                      value={place.id}
+                      style={{
+                        backgroundColor: "#2A1A10",
+                        color: "#F5E6D3",
+                      }}
+                    >
                       {place.name} {place.state ? `(${place.state})` : ""}
                     </option>
                   ))}

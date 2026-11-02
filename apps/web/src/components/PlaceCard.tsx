@@ -15,7 +15,8 @@ export interface PlaceCardProps {
   location: string;
   century?: string;
   category: string;
-  imageUrl: string;
+  imageUrl?: string | null;
+  image_url?: string | null;
   hasOcr?: boolean;
   recordsCount?: number;
   isIllustrative?: boolean;
@@ -35,6 +36,7 @@ export function PlaceCard({
   century,
   category,
   imageUrl,
+  image_url,
   hasOcr = true,
   recordsCount = 0,
   isIllustrative = true,
@@ -52,6 +54,7 @@ export function PlaceCard({
     glowColorVar: "--accent-glow",
   });
 
+  const photoUrl = imageUrl || image_url;
   const displayTitle = language === "mr" && marathiTitle ? marathiTitle : title;
   const targetHref = href ?? (id ? `/place/${id}` : undefined);
 
@@ -62,29 +65,33 @@ export function PlaceCard({
       onClick={onClick}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
-      className={`group relative flex items-start gap-4 p-4.5 rounded-card border transition-all duration-300 ease-soft text-left ${
+      className={`group relative grid grid-cols-[96px_1fr] items-center gap-x-4 p-[16px_20px] min-h-[120px] rounded-card border transition-all duration-300 ease-soft text-left ${
         isSelected
-          ? "bg-[#F2E3D0] text-[#1F2937] border-accent/70 shadow-lift -translate-y-1 ring-1 ring-accent/40"
-          : "glass hover:border-text/40 hover:-translate-y-1 hover:shadow-lift hover:shadow-[0_0_24px_rgba(232,131,74,0.3)] shadow-soft"
+          ? "bg-[#F2E3D0] text-[#1F2937] border-accent/70 shadow-lift ring-1 ring-accent/40"
+          : "glass hover:border-text/40 hover:shadow-lift hover:shadow-[0_0_24px_rgba(232,131,74,0.3)] shadow-soft"
       } ${onClick || targetHref ? "cursor-pointer" : ""} ${className}`}
     >
-      {/* Thumbnail */}
+      {/* Thumbnail: 96px square, border-radius 12px, object-cover, subtle dark gradient at bottom */}
       <div
-        className={`relative w-20 h-20 shrink-0 overflow-hidden rounded-control border ${
+        className={`relative w-[96px] h-[96px] shrink-0 overflow-hidden rounded-[12px] border ${
           isSelected
             ? "border-[#D1C7BA] bg-[#E7D7C3]"
             : "border-border bg-surface-solid"
         }`}
       >
-        {!imageError && imageUrl ? (
-          <Image
-            src={imageUrl}
-            alt={displayTitle}
-            fill
-            sizes="80px"
-            className="object-cover transition-transform duration-300 group-hover:scale-105"
-            onError={() => setImageError(true)}
-          />
+        {!imageError && photoUrl ? (
+          <>
+            <Image
+              src={photoUrl}
+              alt={displayTitle}
+              fill
+              sizes="96px"
+              className="object-cover transition-transform duration-300 group-hover:scale-105"
+              onError={() => setImageError(true)}
+            />
+            {/* Subtle dark gradient at bottom */}
+            <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/60 to-transparent pointer-events-none" />
+          </>
         ) : (
           <div
             className={`w-full h-full flex flex-col items-center justify-center p-2 ${
@@ -109,11 +116,11 @@ export function PlaceCard({
         )}
       </div>
 
-      {/* Details */}
-      <div className="flex-1 min-w-0">
-        <div className="flex items-start justify-between gap-1">
+      {/* Details / Text Column */}
+      <div className="min-w-0 flex flex-col justify-center">
+        <div className="flex items-start justify-between gap-1.5">
           <h3
-            className={`font-serif text-[17px] leading-tight truncate transition-colors ${
+            className={`font-serif text-[17px] leading-[1.3] m-0 transition-colors ${
               isSelected
                 ? "font-bold text-[#1F2937]"
                 : "font-semibold text-text group-hover:text-accent"
@@ -122,7 +129,7 @@ export function PlaceCard({
             {displayTitle}
           </h3>
           <span
-            className={`shrink-0 transition-all ${
+            className={`shrink-0 transition-all mt-0.5 ${
               isSelected
                 ? "text-[#1F2937] group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
                 : "text-accent opacity-85 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
@@ -132,25 +139,28 @@ export function PlaceCard({
           </span>
         </div>
 
-        <p
-          className={`text-xs mt-1 font-sans truncate ${
-            isSelected ? "text-[#4B5563]" : "text-text-muted"
-          }`}
-        >
-          {location}
-        </p>
+        {/* Meta Lines: 4px spacing */}
+        <div className="flex flex-col gap-1 mt-1">
+          <p
+            className={`text-xs m-0 font-sans truncate ${
+              isSelected ? "text-[#4B5563]" : "text-text-muted"
+            }`}
+          >
+            {location}
+          </p>
 
-        <p
-          className={`text-[11px] mt-0.5 font-sans truncate ${
-            isSelected ? "text-[#6B7280]" : "text-text-muted/80"
-          }`}
-        >
-          {century ? `${century} · ` : ""}
-          {category}
-        </p>
+          <p
+            className={`text-[11px] m-0 font-sans truncate ${
+              isSelected ? "text-[#6B7280]" : "text-text-muted/80"
+            }`}
+          >
+            {century ? `${century} · ` : ""}
+            {category}
+          </p>
+        </div>
 
-        {/* Badges & Record count */}
-        <div className="flex flex-wrap items-center gap-2 mt-2">
+        {/* Badges & Record count: 10px margin-top */}
+        <div className="flex flex-wrap items-center gap-2 mt-[10px]">
           {hasOcr && (
             <Badge
               variant="ocr"

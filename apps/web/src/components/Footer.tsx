@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useLanguage } from "@/i18n";
 
@@ -24,6 +25,8 @@ export function Footer({ pageCode, className = "" }: FooterProps) {
       currentPageCode = t.footer.pageCodes.contribute;
     } else if (pathname.startsWith("/place")) {
       currentPageCode = t.footer.pageCodes.place;
+    } else if (pathname.startsWith("/sources")) {
+      currentPageCode = t.footer.pageCodes.sources;
     } else {
       currentPageCode = t.footer.pageCodes.home;
     }
@@ -45,17 +48,12 @@ export function Footer({ pageCode, className = "" }: FooterProps) {
 
         {/* Right: Sources & Attribution and Page Indicator */}
         <div className="flex items-center gap-6">
-          <button
-            type="button"
-            onClick={() => {
-              alert(
-                "Virasat Heritage Atlas — Sources include Archaeological Survey of India (ASI) public archives, Gazetteers, and community contributions."
-              );
-            }}
+          <Link
+            href="/sources"
             className="hover:text-text transition-colors underline-offset-2 hover:underline cursor-pointer uppercase tracking-wider"
           >
             {t.footer.sourcesAndAttribution}
-          </button>
+          </Link>
 
           <span className="text-border/60 select-none hidden sm:inline">|</span>
 

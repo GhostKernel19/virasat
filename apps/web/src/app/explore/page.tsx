@@ -321,7 +321,7 @@ export default function ExplorePage() {
                 </p>
               </div>
             ) : (
-              <div className="flex flex-col gap-3.5 overflow-y-auto max-h-[740px] pr-1.5">
+              <div className="flex flex-col gap-[14px] py-2 overflow-y-auto max-h-[740px] pr-1.5">
                 {filteredPlaces.map((place) => {
                   const isSelected = place.id === selectedPlaceId;
                   return (

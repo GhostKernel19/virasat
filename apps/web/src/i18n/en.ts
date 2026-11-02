@@ -23,6 +23,7 @@ export interface TranslationDictionary {
       contribute: string;
       place: string;
       admin: string;
+      sources: string;
     };
   };
   common: {
@@ -170,6 +171,19 @@ export interface TranslationDictionary {
       loading: string;
       viewPlace: string;
     };
+    sources: {
+      badge: string;
+      title: string;
+      subtitle: string;
+      photoCreditsTitle: string;
+      photoCreditsSubtitle: string;
+      archivesTitle: string;
+      archivesSubtitle: string;
+      viewDossier: string;
+      backToExplore: string;
+      attributionNotice: string;
+      noCredit: string;
+    };
   };
 }
 
@@ -198,6 +212,7 @@ export const en: TranslationDictionary = {
       contribute: "03 / CONTRIBUTE",
       place: "04 / PLACE",
       admin: "05 / ADMIN",
+      sources: "06 / SOURCES",
     },
   },
   common: {
@@ -350,6 +365,19 @@ export const en: TranslationDictionary = {
       noItems: "No items matching this status.",
       loading: "Loading moderation items...",
       viewPlace: "View Place Dossier",
+    },
+    sources: {
+      badge: "TRANSPARENCY & ATTRIBUTION",
+      title: "Sources & Photographic Credits",
+      subtitle: "Attribution details, archival provenance, and image credits for places documented across the Virasat Heritage Atlas.",
+      photoCreditsTitle: "Monument & Place Photographic Credits",
+      photoCreditsSubtitle: "High-resolution architectural photography, field documentation, and creative commons heritage archives.",
+      archivesTitle: "Archival & Institutional Repositories",
+      archivesSubtitle: "Historical manuscripts, epigraphic surveys, gazetteers, and open geospatial cartography.",
+      viewDossier: "View Place Dossier",
+      backToExplore: "Explore the Map",
+      attributionNotice: "All photographs and archival records are attributed to their respective authors or repositories under applicable Creative Commons licenses or public domain status.",
+      noCredit: "Photo via Wikimedia Commons",
     },
   },
 };

@@ -307,7 +307,7 @@ export function MapExplorer({
             transition={{ duration: shouldReduceMotion ? 0 : 0.28, ease: "easeOut" }}
             className="absolute bottom-4 left-4 right-4 z-20"
           >
-            <div className="p-5.5 glass shadow-soft text-text rounded-card border border-border/80">
+            <div className="p-[16px_20px] glass shadow-soft text-text rounded-card border border-border/80">
               {/* Panel Top Bar */}
               <div className="flex items-center justify-between pb-2 mb-3 border-b border-border/70">
                 <div className="flex items-center gap-2">
@@ -330,17 +330,22 @@ export function MapExplorer({
                 </button>
               </div>
 
-              {/* Panel Content Body */}
-              <div className="flex items-start gap-3.5">
-                <div className="relative w-16 h-16 shrink-0 rounded-control overflow-hidden border border-border bg-surface-solid shadow-soft">
-                  {selectedPlace.imageUrl ? (
-                    <Image
-                      src={selectedPlace.imageUrl}
-                      alt={displaySelectedTitle || selectedPlace.name}
-                      fill
-                      sizes="64px"
-                      className="object-cover"
-                    />
+              {/* Panel Content Body: Vertically Centred */}
+              <div className="flex items-center gap-4">
+                {/* Thumbnail: 72px with radius 12px, object-cover, subtle dark gradient at bottom */}
+                <div className="relative w-[72px] h-[72px] shrink-0 rounded-[12px] overflow-hidden border border-border bg-surface-solid shadow-soft">
+                  {(selectedPlace.imageUrl || selectedPlace.image_url) ? (
+                    <>
+                      <Image
+                        src={selectedPlace.imageUrl || selectedPlace.image_url!}
+                        alt={displaySelectedTitle || selectedPlace.name}
+                        fill
+                        sizes="72px"
+                        className="object-cover"
+                      />
+                      {/* Subtle dark gradient at bottom */}
+                      <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/60 to-transparent pointer-events-none" />
+                    </>
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-text-muted">
                       <Landmark className="w-6 h-6 text-accent/60" />

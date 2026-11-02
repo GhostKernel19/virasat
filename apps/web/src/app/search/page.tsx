@@ -317,12 +317,49 @@ function SearchContent() {
                 const newType = isAllTypes(val) ? "" : val;
                 setSelectedType(newType);
               }}
-              className="px-4 py-3 rounded-pill border border-border bg-surface-solid/80 text-xs sm:text-sm text-text focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent cursor-pointer transition-all duration-300 ease-soft"
+              className="px-4 py-3 rounded-pill border border-border text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent cursor-pointer transition-all duration-300 ease-soft [color-scheme:dark]"
+              style={{
+                backgroundColor: "#2A1A10",
+                color: "#F5E6D3",
+                colorScheme: "dark",
+              }}
             >
-              <option value="">{t.routes.search.allTypes}</option>
-              <option value="Stepwell">Stepwell</option>
-              <option value="Hill Fort">Hill Fort</option>
-              <option value="Temple Complex">Temple Complex</option>
+              <option
+                value=""
+                style={{
+                  backgroundColor: "#2A1A10",
+                  color: "rgba(245, 230, 211, 0.88)",
+                }}
+              >
+                {t.routes.search.allTypes}
+              </option>
+              <option
+                value="Stepwell"
+                style={{
+                  backgroundColor: "#2A1A10",
+                  color: "#F5E6D3",
+                }}
+              >
+                Stepwell
+              </option>
+              <option
+                value="Hill Fort"
+                style={{
+                  backgroundColor: "#2A1A10",
+                  color: "#F5E6D3",
+                }}
+              >
+                Hill Fort
+              </option>
+              <option
+                value="Temple Complex"
+                style={{
+                  backgroundColor: "#2A1A10",
+                  color: "#F5E6D3",
+                }}
+              >
+                Temple Complex
+              </option>
             </select>
           </div>
         </form>

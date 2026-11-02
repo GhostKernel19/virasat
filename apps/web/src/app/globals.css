@@ -301,6 +301,43 @@ h1, h2, h3, h4, h5, h6 {
   }
 }
 
+/* =========================================================================
+   Dropdowns & Select Controls
+   ========================================================================= */
+select {
+  color-scheme: dark;
+  background-color: #2A1A10 !important;
+  color: #F5E6D3 !important;
+}
+
+select option {
+  background-color: #2A1A10 !important;
+  color: #F5E6D3 !important;
+  opacity: 1 !important;
+}
+
+select option:checked,
+select option:hover {
+  background-color: #E8834A !important;
+  color: #150904 !important;
+}
+
+select option[value=""] {
+  color: rgba(245, 230, 211, 0.88) !important;
+  background-color: #2A1A10 !important;
+}
+
+/* =========================================================================
+   ScrollTrigger & Debug Marker Suppression
+   ========================================================================= */
+.gsap-marker-start,
+.gsap-marker-end,
+.gsap-marker-scroller-start,
+.gsap-marker-scroller-end {
+  display: none !important;
+  visibility: hidden !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .virasat-pin-marker.is-selected,
   .virasat-pin-halo-pulse {

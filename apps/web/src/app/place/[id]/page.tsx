@@ -255,11 +255,7 @@ export default function PlaceDetailPage({ params }: PlaceDetailPageProps) {
     }
   };
 
-  const heroImageUrl =
-    PLACE_HERO_IMAGES[placeId] ||
-    PLACE_HERO_IMAGES[place?.id || ""] ||
-    items[0]?.media?.[0]?.url ||
-    "/places/rani-ki-vav.png";
+  const heroImageUrl = place?.image_url || null;
 
   return (
     <div className="min-h-screen flex flex-col text-text bg-bg-0 relative">
@@ -342,14 +338,25 @@ export default function PlaceDetailPage({ params }: PlaceDetailPageProps) {
         {!loading && !error && place && (
           <div>
             {/* Large Rounded Hero Image */}
-            <div className="relative w-full h-64 sm:h-80 lg:h-96 rounded-card overflow-hidden border border-border shadow-lift mb-8 bg-surface-solid">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={heroImageUrl}
-                alt={place.name}
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-bg-0 via-bg-0/30 to-transparent opacity-85 pointer-events-none" />
+            <div className={`relative w-full h-64 sm:h-80 lg:h-96 rounded-card overflow-hidden border border-border shadow-lift bg-surface-solid ${place.image_credit ? "mb-2" : "mb-8"}`}>
+              {heroImageUrl ? (
+                <>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={heroImageUrl}
+                    alt={place.name}
+                    className="w-full h-full object-cover"
+                  />
+                  {/* Subtle dark gradient at the bottom */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-bg-0 via-bg-0/30 to-transparent opacity-85 pointer-events-none" />
+                </>
+              ) : (
+                /* Fallback to dark gradient with icon */
+                <div className="w-full h-full bg-gradient-to-b from-bg-1 to-bg-0 flex items-center justify-center text-text-muted">
+                  <Landmark className="w-16 h-16 text-accent/40" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-bg-0 via-bg-0/30 to-transparent opacity-85 pointer-events-none" />
+                </div>
+              )}
               <div className="absolute bottom-6 left-6 right-6 flex items-end justify-between gap-4">
                 <div>
                   <div className="flex items-center gap-2 mb-2">
@@ -370,6 +377,13 @@ export default function PlaceDetailPage({ params }: PlaceDetailPageProps) {
                 </div>
               </div>
             </div>
+
+            {/* Image credit as small muted text under the hero image */}
+            {place.image_credit && (
+              <p className="text-[11px] text-text-muted/75 font-mono mb-8 px-1">
+                Photo credit: {place.image_credit}
+              </p>
+            )}
 
             {/* Metadata Glass Panel */}
             <div className="glass p-7 sm:p-8 mb-10 shadow-soft rounded-card">

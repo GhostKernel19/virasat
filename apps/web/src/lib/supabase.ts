@@ -14,6 +14,8 @@ export interface PlaceRecord {
   period: string | null;
   type: string | null;
   summary: string | null;
+  image_url?: string | null;
+  image_credit?: string | null;
   is_illustrative: boolean;
   created_at: string;
   updated_at: string;

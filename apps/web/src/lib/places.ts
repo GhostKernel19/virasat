@@ -15,7 +15,10 @@ export const FALLBACK_PLACES: Place[] = [
     category: "Stepwell",
     summary:
       "Subterranean inverted water temple built by Queen Udayamati in memory of King Bhima I of the Solanki dynasty, featuring seven pillared terraced levels and over 500 principal sculptures honoring water sanctity.",
-    imageUrl: "/places/rani-ki-vav.png",
+    imageUrl: "/images/places/rani-ki-vav.webp",
+    image_url: "/images/places/rani-ki-vav.webp",
+    image_credit: "Photo via Wikimedia Commons (credit to be added)",
+    imageCredit: "Photo via Wikimedia Commons (credit to be added)",
     hasOcr: true,
     recordsCount: 12,
     isIllustrative: true,
@@ -33,7 +36,10 @@ export const FALLBACK_PLACES: Place[] = [
     category: "Stepwell",
     summary:
       "Five-story octagonal subterranean stepwell built by Queen Rudabai, harmonizing Solanki structural engineering with delicate Indo-Islamic floral friezes along historic caravan trade routes.",
-    imageUrl: "/places/adalaj-stepwell.png",
+    imageUrl: "/images/places/adalaj-stepwell.webp",
+    image_url: "/images/places/adalaj-stepwell.webp",
+    image_credit: "Photo via Wikimedia Commons (credit to be added)",
+    imageCredit: "Photo via Wikimedia Commons (credit to be added)",
     hasOcr: false,
     recordsCount: 8,
     isIllustrative: true,
@@ -51,7 +57,10 @@ export const FALLBACK_PLACES: Place[] = [
     category: "Hill Fort",
     summary:
       "Majestic hilltop fortress overlooking Maota Lake, constructed of red sandstone and marble featuring integrated rain-fed water harvesting channels, courtyards, and mirror mosaics (Sheesh Mahal).",
-    imageUrl: "/places/amer-fort.png",
+    imageUrl: "/images/places/amer-fort.webp",
+    image_url: "/images/places/amer-fort.webp",
+    image_credit: "Photo via Wikimedia Commons (credit to be added)",
+    imageCredit: "Photo via Wikimedia Commons (credit to be added)",
     hasOcr: true,
     recordsCount: 16,
     isIllustrative: true,
@@ -69,7 +78,10 @@ export const FALLBACK_PLACES: Place[] = [
     category: "Temple complex",
     summary:
       "Sprawling monumental ruins of the capital of the Vijayanagara Empire along the Tungabhadra River, renowned for the monolithic stone chariot at the Vittala temple and rock-cut architectural pavilions.",
-    imageUrl: "/places/hampi.png",
+    imageUrl: "/images/places/hampi.webp",
+    image_url: "/images/places/hampi.webp",
+    image_credit: "Photo via Wikimedia Commons (credit to be added)",
+    imageCredit: "Photo via Wikimedia Commons (credit to be added)",
     hasOcr: true,
     recordsCount: 24,
     isIllustrative: true,
@@ -139,6 +151,7 @@ export async function fetchPlacesFromSupabase(): Promise<Place[]> {
 
       const realCount = countByPlace[row.id] ?? 0;
       const hasOcr = realCount > 0;
+      const finalImage = row.image_url || null;
 
       return {
         id: row.id,
@@ -152,7 +165,10 @@ export async function fetchPlacesFromSupabase(): Promise<Place[]> {
         period: row.period || "",
         category: row.type || "Monument",
         summary: row.summary ? row.summary.replace(/^\[Illustrative\]\s*/i, "") : "",
-        imageUrl: meta.imageUrl,
+        imageUrl: finalImage,
+        image_url: finalImage,
+        image_credit: row.image_credit || null,
+        imageCredit: row.image_credit || null,
         hasOcr,
         recordsCount: realCount,
         isIllustrative: row.is_illustrative,
