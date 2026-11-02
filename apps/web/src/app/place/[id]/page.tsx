@@ -198,7 +198,7 @@ export default function PlaceDetailPage({ params }: PlaceDetailPageProps) {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-sand text-ink">
+    <div className="min-h-screen flex flex-col text-text">
       <Navbar />
 
       <main className="flex-1 max-w-5xl w-full mx-auto px-5 sm:px-8 lg:px-10 py-10">
@@ -206,7 +206,7 @@ export default function PlaceDetailPage({ params }: PlaceDetailPageProps) {
         <div className="flex items-center justify-between gap-4 mb-6">
           <Link
             href="/explore"
-            className="inline-flex items-center gap-1.5 text-xs font-medium text-ink/75 hover:text-terracotta transition-colors"
+            className="inline-flex items-center gap-1.5 text-xs font-medium text-text-muted hover:text-accent transition-colors"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
             <span>Back to Explore</span>
@@ -217,12 +217,12 @@ export default function PlaceDetailPage({ params }: PlaceDetailPageProps) {
               type="button"
               onClick={handleCite}
               aria-label="Copy citation"
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-control border border-line bg-[#FAF7F2] hover:bg-[#FDFBF7] text-xs font-medium text-ink transition-all duration-300 ease-soft shadow-soft hover:shadow-lift hover:-translate-y-0.5 cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-control border border-border bg-surface hover:bg-surface-solid text-xs font-medium text-text transition-all duration-300 ease-soft shadow-soft hover:shadow-lift hover:-translate-y-0.5 cursor-pointer"
             >
               {copied ? (
-                <Check className="w-3.5 h-3.5 text-green" />
+                <Check className="w-3.5 h-3.5 text-success" />
               ) : (
-                <Quote className="w-3.5 h-3.5 text-terracotta" />
+                <Quote className="w-3.5 h-3.5 text-accent" />
               )}
               <span>{copied ? "Copied citation!" : "Cite"}</span>
             </button>
@@ -231,23 +231,23 @@ export default function PlaceDetailPage({ params }: PlaceDetailPageProps) {
 
         {/* Loading State */}
         {loading && (
-          <div className="p-12 text-center text-ink/60">
-            <div className="w-6 h-6 border-2 border-terracotta border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+          <div className="p-12 text-center text-text-muted">
+            <div className="w-6 h-6 border-2 border-accent border-t-transparent rounded-full animate-spin mx-auto mb-3" />
             <p className="text-xs font-mono uppercase tracking-wider">Loading place dossier...</p>
           </div>
         )}
 
         {/* Error State */}
         {error && (
-          <div className="p-6 rounded-card border border-red-200 bg-red-50/80 text-red-900 my-6 shadow-soft">
+          <div className="p-6 rounded-card border border-danger/30 bg-danger/10 text-text my-6 shadow-soft">
             <div className="flex items-center gap-2 mb-2">
-              <AlertTriangle className="w-5 h-5 text-red-600 shrink-0" />
+              <AlertTriangle className="w-5 h-5 text-danger shrink-0" />
               <h3 className="font-semibold text-sm">Failed to Load Place Dossier</h3>
             </div>
-            <p className="text-xs text-red-700 mb-4">{error}</p>
+            <p className="text-xs text-danger mb-4">{error}</p>
             <Link
               href="/explore"
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-control border border-line bg-[#FAF7F2] text-xs font-medium text-ink hover:border-terracotta transition-colors shadow-soft"
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-control border border-border bg-surface text-xs font-medium text-text hover:border-accent transition-colors shadow-soft"
             >
               ← Back to Explore
             </Link>
@@ -258,7 +258,7 @@ export default function PlaceDetailPage({ params }: PlaceDetailPageProps) {
         {!loading && !error && place && (
           <div>
             {/* Place Metadata Card */}
-            <div className="bg-[#FAF7F2] border border-line rounded-card p-8 mb-10 shadow-soft">
+            <div className="glass p-8 mb-10 shadow-soft">
               <div className="flex flex-wrap items-center gap-2 mb-3">
                 {place.type && (
                   <Badge variant="terracotta" size="sm">
@@ -272,14 +272,14 @@ export default function PlaceDetailPage({ params }: PlaceDetailPageProps) {
                 )}
               </div>
 
-              <h1 className="font-serif text-3xl sm:text-4xl font-semibold text-ink mb-3">
+              <h1 className="font-serif text-3xl sm:text-4xl font-semibold text-text mb-3">
                 {place.name}
               </h1>
 
               {/* Metadata row: State, Period, Type */}
-              <div className="flex flex-wrap items-center gap-y-2 gap-x-6 text-xs text-ink/70 mb-4 pb-4 border-b border-line/60">
+              <div className="flex flex-wrap items-center gap-y-2 gap-x-6 text-xs text-text-muted mb-4 pb-4 border-b border-border/60">
                 <div className="flex items-center gap-1.5">
-                  <MapPin className="w-3.5 h-3.5 text-terracotta" />
+                  <MapPin className="w-3.5 h-3.5 text-accent" />
                   <span>
                     {place.region ? `${place.region}, ` : ""}
                     {place.state}
@@ -288,25 +288,25 @@ export default function PlaceDetailPage({ params }: PlaceDetailPageProps) {
 
                 {place.period && (
                   <div className="flex items-center gap-1.5">
-                    <Calendar className="w-3.5 h-3.5 text-gold-dark" />
+                    <Calendar className="w-3.5 h-3.5 text-accent-2" />
                     <span>Period: {place.period}</span>
                   </div>
                 )}
 
                 {place.type && (
                   <div className="flex items-center gap-1.5">
-                    <Landmark className="w-3.5 h-3.5 text-indigo" />
+                    <Landmark className="w-3.5 h-3.5 text-accent" />
                     <span>Type: {place.type}</span>
                   </div>
                 )}
 
                 <div className="flex items-center gap-1.5">
-                  <FileText className="w-3.5 h-3.5 text-terracotta" />
+                  <FileText className="w-3.5 h-3.5 text-accent" />
                   <span>{items.length} {items.length === 1 ? "record" : "records"}</span>
                 </div>
 
                 {typeof place.lat === "number" && typeof place.lng === "number" && (
-                  <div className="text-ink/40 font-mono text-[11px]">
+                  <div className="text-text-muted/60 font-mono text-[11px]">
                     {place.lat.toFixed(4)}° N, {place.lng.toFixed(4)}° E
                   </div>
                 )}
@@ -314,7 +314,7 @@ export default function PlaceDetailPage({ params }: PlaceDetailPageProps) {
 
               {/* Summary */}
               {place.summary && (
-                <p className="text-sm text-ink/80 leading-relaxed font-sans">
+                <p className="text-sm text-text/80 leading-relaxed font-sans">
                   {place.summary.replace(/^\[Illustrative\]\s*/i, "")}
                 </p>
               )}
@@ -323,16 +323,16 @@ export default function PlaceDetailPage({ params }: PlaceDetailPageProps) {
             {/* OCR Records Section */}
             <div className="space-y-6">
               <div className="flex items-center gap-2">
-                <FileText className="w-4 h-4 text-terracotta" />
-                <h2 className="font-serif text-xl font-semibold text-ink">
+                <FileText className="w-4 h-4 text-accent" />
+                <h2 className="font-serif text-xl font-semibold text-text">
                   Archival Records & OCR Transcripts ({items.length})
                 </h2>
               </div>
 
               {items.length === 0 ? (
-                <div className="p-10 rounded-card border border-dashed border-line bg-sand-50/80 text-center text-ink/60 my-4 shadow-soft">
-                  <p className="text-sm font-sans font-medium text-ink/80">No published records yet</p>
-                  <p className="text-xs text-ink/50 mt-1">
+                <div className="p-10 rounded-card border border-dashed border-border bg-surface/50 text-center text-text-muted my-4 shadow-soft">
+                  <p className="text-sm font-sans font-medium text-text">No published records yet</p>
+                  <p className="text-xs text-text-muted mt-1">
                     This place does not have any verified or published OCR records in the atlas.
                   </p>
                 </div>
@@ -344,15 +344,15 @@ export default function PlaceDetailPage({ params }: PlaceDetailPageProps) {
                   return (
                     <div
                       key={item.id}
-                      className="space-y-5 p-6.5 rounded-card border border-line bg-[#FAF7F2] shadow-soft hover:shadow-lift hover:-translate-y-1 transition-all duration-300 ease-soft"
+                      className="space-y-5 p-6.5 glass shadow-soft hover:shadow-lift hover:-translate-y-1 transition-all duration-300 ease-soft"
                     >
-                      <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2 border-b border-line/70 pb-3">
+                      <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2 border-b border-border/70 pb-3">
                         <div>
-                          <h3 className="font-serif text-base sm:text-lg font-semibold text-ink">
+                          <h3 className="font-serif text-base sm:text-lg font-semibold text-text">
                             {item.title.replace(/^\[Illustrative\]\s*/i, "")}
                           </h3>
                           {item.contributor && (
-                            <p className="text-xs text-ink/50 mt-0.5">
+                            <p className="text-xs text-text-muted mt-0.5">
                               Contributor: {item.contributor.replace(/^\[Illustrative\]\s*/i, "")}
                             </p>
                           )}
@@ -367,7 +367,7 @@ export default function PlaceDetailPage({ params }: PlaceDetailPageProps) {
                       {/* Display primary media image if attached */}
                       {primaryMedia?.url && (
                         <div className="flex flex-col sm:flex-row gap-4 items-start pb-2">
-                          <div className="w-full sm:w-56 sm:h-40 shrink-0 rounded-control overflow-hidden border border-line bg-sand-100 shadow-soft">
+                          <div className="w-full sm:w-56 sm:h-40 shrink-0 rounded-control overflow-hidden border border-border bg-surface-solid shadow-soft">
                             {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img
                               src={primaryMedia.url}
@@ -376,7 +376,7 @@ export default function PlaceDetailPage({ params }: PlaceDetailPageProps) {
                             />
                           </div>
                           {primaryMedia.caption && (
-                            <p className="text-xs text-ink/65 italic self-end sm:self-center">
+                            <p className="text-xs text-text-muted italic self-end sm:self-center">
                               {primaryMedia.caption}
                             </p>
                           )}
@@ -384,7 +384,7 @@ export default function PlaceDetailPage({ params }: PlaceDetailPageProps) {
                       )}
 
                       {ocrList.length === 0 ? (
-                        <p className="text-xs text-ink/50 italic py-2">
+                        <p className="text-xs text-text-muted italic py-2">
                           No OCR transcripts attached to this item.
                         </p>
                       ) : (
@@ -404,7 +404,7 @@ export default function PlaceDetailPage({ params }: PlaceDetailPageProps) {
 
                           if (rawLines.length === 0 && !translationText) {
                             return (
-                              <p key={ocr.id} className="text-xs text-ink/50 italic py-2">
+                              <p key={ocr.id} className="text-xs text-text-muted italic py-2">
                                 OCR transcript pending or unavailable.
                               </p>
                             );
@@ -413,12 +413,12 @@ export default function PlaceDetailPage({ params }: PlaceDetailPageProps) {
                           return (
                             <div
                               key={ocr.id}
-                              className="border border-line rounded-control overflow-hidden bg-[#FAF7F2] shadow-xs"
+                              className="border border-border rounded-control overflow-hidden bg-surface-solid/80 shadow-soft"
                             >
                               <div className="overflow-x-auto">
                                 <table className="w-full text-left border-collapse">
                                   <thead>
-                                    <tr className="bg-sand-100/90 border-b border-line text-xs font-semibold text-ink">
+                                    <tr className="bg-surface border-b border-border text-xs font-semibold text-text">
                                       <th className="py-2.5 px-4 w-1/2">
                                         Original Devanagari line
                                       </th>
@@ -427,7 +427,7 @@ export default function PlaceDetailPage({ params }: PlaceDetailPageProps) {
                                       </th>
                                     </tr>
                                   </thead>
-                                  <tbody className="divide-y divide-line/60 text-sm">
+                                  <tbody className="divide-y divide-border/60 text-sm">
                                     {rawLines.length > 0 ? (
                                       rawLines.map((line, idx) => {
                                         const confidenceVal =
@@ -440,19 +440,19 @@ export default function PlaceDetailPage({ params }: PlaceDetailPageProps) {
                                         return (
                                           <tr
                                             key={idx}
-                                            className="hover:bg-sand-50/50 transition-colors"
+                                            className="hover:bg-surface/50 transition-colors"
                                           >
-                                            <td className="py-3 px-4 align-top font-devanagari text-[15px] leading-relaxed text-ink">
+                                            <td className="py-3 px-4 align-top font-devanagari text-[15px] leading-relaxed text-text">
                                               <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2">
                                                 <span>{line.text}</span>
                                                 {confidenceVal && (
-                                                  <span className="shrink-0 text-[10px] font-mono px-2 py-0.5 rounded-pill bg-sand-200/90 text-ink/70 border border-line/60">
+                                                  <span className="shrink-0 text-[10px] font-mono px-2 py-0.5 rounded-pill bg-surface text-text-muted border border-border">
                                                     {confidenceVal}
                                                   </span>
                                                 )}
                                               </div>
                                             </td>
-                                            <td className="py-3 px-4 align-top font-sans text-xs text-ink/80 leading-relaxed">
+                                            <td className="py-3 px-4 align-top font-sans text-xs text-text/80 leading-relaxed">
                                               {translationLines[idx] || translationText || "—"}
                                             </td>
                                           </tr>
@@ -460,10 +460,10 @@ export default function PlaceDetailPage({ params }: PlaceDetailPageProps) {
                                       })
                                     ) : (
                                       <tr>
-                                        <td className="py-3 px-4 align-top font-devanagari text-[15px] leading-relaxed text-ink">
+                                        <td className="py-3 px-4 align-top font-devanagari text-[15px] leading-relaxed text-text">
                                           {ocr.original_text || "—"}
                                         </td>
-                                        <td className="py-3 px-4 align-top font-sans text-xs text-ink/80 leading-relaxed">
+                                        <td className="py-3 px-4 align-top font-sans text-xs text-text/80 leading-relaxed">
                                           {translationText || "—"}
                                         </td>
                                       </tr>

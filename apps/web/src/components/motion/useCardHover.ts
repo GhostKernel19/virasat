@@ -39,7 +39,7 @@ export function useCardHover<T extends HTMLElement = HTMLDivElement>(
       const handleMouseEnter = () => {
         gsap.to(el, {
           y: -4,
-          boxShadow: "0 24px 60px -20px rgba(46, 27, 16, 0.28)",
+          boxShadow: "var(--shadow-lift)",
           duration: 0.3,
           ease: "cubic-bezier(0.22, 1, 0.36, 1)",
           overwrite: "auto",
@@ -49,7 +49,7 @@ export function useCardHover<T extends HTMLElement = HTMLDivElement>(
       const handleMouseLeave = () => {
         gsap.to(el, {
           y: 0,
-          boxShadow: "0 10px 40px -12px rgba(46, 27, 16, 0.18)",
+          boxShadow: "var(--shadow-soft)",
           duration: 0.3,
           ease: "cubic-bezier(0.22, 1, 0.36, 1)",
           overwrite: "auto",

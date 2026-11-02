@@ -163,36 +163,36 @@ export default function ExplorePage() {
   }, [filteredPlaces, selectedPlaceId]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-sand text-ink">
+    <div className="min-h-screen flex flex-col text-text">
       <Navbar />
 
       <main className="flex-1 max-w-7xl w-full mx-auto px-5 sm:px-8 lg:px-10 py-10 flex flex-col">
         {/* Header Section */}
         <div className="mb-6">
           <div className="flex items-center gap-2 mb-2">
-            <span className="w-1.5 h-1.5 rounded-pill bg-terracotta" />
-            <p className="text-[11px] font-bold tracking-widest text-terracotta uppercase">
+            <span className="w-1.5 h-1.5 rounded-pill bg-accent" />
+            <p className="text-[11px] font-bold tracking-widest text-accent uppercase">
               {t.routes.explore.badge}
             </p>
           </div>
 
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
             <div>
-              <h1 className="font-serif text-3xl sm:text-4xl font-normal leading-tight text-ink">
+              <h1 className="font-serif text-3xl sm:text-4xl font-normal leading-tight text-text">
                 {t.routes.explore.title}
               </h1>
-              <p className="mt-2 text-sm text-ink/70 max-w-2xl">
+              <p className="mt-2 text-sm text-text-muted max-w-2xl">
                 {t.routes.explore.subtitle}
               </p>
             </div>
 
             {/* Total Metric */}
-            <div className="flex items-center gap-6 self-start md:self-auto border-l md:border-l-0 pl-3 md:pl-0 border-line">
+            <div className="flex items-center gap-6 self-start md:self-auto border-l md:border-l-0 pl-3 md:pl-0 border-border">
               <div>
-                <span className="font-serif text-2xl sm:text-3xl text-terracotta font-normal block leading-none">
+                <span className="font-serif text-2xl sm:text-3xl text-accent font-normal block leading-none">
                   {formatNumber(filteredPlaces.length, language)}
                 </span>
-                <span className="text-[10px] text-ink/60 uppercase tracking-wider mt-1 block">
+                <span className="text-[10px] text-text-muted uppercase tracking-wider mt-1 block">
                   {t.common.placesMapped}
                 </span>
               </div>
@@ -216,8 +216,8 @@ export default function ExplorePage() {
               <span
                 className={`text-[10px] px-2 py-0.5 rounded-pill font-mono ${
                   activeFilter === "all"
-                    ? "bg-sand text-ink font-semibold"
-                    : "bg-sand-200 text-ink/70"
+                    ? "bg-bg-0 text-text font-semibold"
+                    : "bg-surface-solid text-text-muted"
                 }`}
               >
                 {formatNumber(filterCounts.all, language)}
@@ -239,8 +239,8 @@ export default function ExplorePage() {
               <span
                 className={`text-[10px] px-2 py-0.5 rounded-pill font-mono ${
                   activeFilter === "ocr"
-                    ? "bg-sand text-ink font-semibold"
-                    : "bg-sand-200 text-ink/70"
+                    ? "bg-bg-0 text-text font-semibold"
+                    : "bg-surface-solid text-text-muted"
                 }`}
               >
                 {formatNumber(filterCounts.ocr, language)}
@@ -262,8 +262,8 @@ export default function ExplorePage() {
               <span
                 className={`text-[10px] px-2 py-0.5 rounded-pill font-mono ${
                   activeFilter === "stepwells"
-                    ? "bg-sand text-ink font-semibold"
-                    : "bg-sand-200 text-ink/70"
+                    ? "bg-bg-0 text-text font-semibold"
+                    : "bg-surface-solid text-text-muted"
                 }`}
               >
                 {formatNumber(filterCounts.stepwells, language)}
@@ -285,8 +285,8 @@ export default function ExplorePage() {
               <span
                 className={`text-[10px] px-2 py-0.5 rounded-pill font-mono ${
                   activeFilter === "forts"
-                    ? "bg-sand text-ink font-semibold"
-                    : "bg-sand-200 text-ink/70"
+                    ? "bg-bg-0 text-text font-semibold"
+                    : "bg-surface-solid text-text-muted"
                 }`}
               >
                 {formatNumber(filterCounts.forts, language)}
@@ -300,15 +300,15 @@ export default function ExplorePage() {
           {/* Left Column: PlaceCard List */}
           <div className="lg:col-span-5 flex flex-col gap-3.5 order-2 lg:order-1">
             {loading ? (
-              <div className="p-10 rounded-card border border-line bg-[#FAF7F2] text-center flex flex-col items-center justify-center shadow-soft">
-                <Loader2 className="w-6 h-6 animate-spin text-terracotta mb-2" />
-                <p className="text-xs text-ink/70 font-sans">
+              <div className="p-10 glass text-center flex flex-col items-center justify-center shadow-soft">
+                <Loader2 className="w-6 h-6 animate-spin text-accent mb-2" />
+                <p className="text-xs text-text-muted font-sans">
                   {t.routes.explore.loadingPlaces}
                 </p>
               </div>
             ) : filteredPlaces.length === 0 ? (
-              <div className="p-10 rounded-card border border-line bg-[#FAF7F2] text-center shadow-soft">
-                <p className="text-sm text-ink/70">
+              <div className="p-10 glass text-center shadow-soft">
+                <p className="text-sm text-text-muted">
                   {t.routes.explore.noPlacesFound}
                 </p>
               </div>

@@ -10,22 +10,22 @@ export default function HomePage() {
   const { t } = useLanguage();
 
   return (
-    <div className="min-h-screen flex flex-col bg-sand text-ink">
+    <div className="min-h-screen flex flex-col text-text">
       <Navbar />
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden isolate w-full bg-[var(--hero-brown-2)] py-24 sm:py-32 lg:py-40 px-5 sm:px-8 lg:px-10 flex flex-col items-center justify-center text-center">
+      <section className="relative overflow-hidden isolate w-full py-24 sm:py-32 lg:py-40 px-5 sm:px-8 lg:px-10 flex flex-col items-center justify-center text-center">
         <HeroVideo />
 
         {/* Hero Text and CTAs */}
         <div className="relative z-10 max-w-4xl mx-auto flex flex-col items-center">
-          <p className="text-xs sm:text-sm font-bold tracking-widest text-terracotta uppercase mb-3 hero-text-shadow">
+          <p className="text-xs sm:text-sm font-bold tracking-widest text-accent uppercase mb-3 hero-text-shadow">
             {t.routes.home.badge}
           </p>
-          <h1 className="font-serif text-3xl sm:text-5xl lg:text-6xl font-normal leading-tight text-sand hero-text-shadow">
+          <h1 className="font-serif text-3xl sm:text-5xl lg:text-6xl font-normal leading-tight text-text hero-text-shadow">
             {t.routes.home.title}
           </h1>
-          <p className="mt-4 sm:mt-5 text-base sm:text-lg text-sand/90 max-w-2xl mx-auto leading-relaxed hero-text-shadow">
+          <p className="mt-4 sm:mt-5 text-base sm:text-lg text-text/90 max-w-2xl mx-auto leading-relaxed hero-text-shadow">
             {t.routes.home.subtitle}
           </p>
 
@@ -44,7 +44,7 @@ export default function HomePage() {
                 variant="secondary"
                 size="lg"
                 iconRight={<ArrowRight className="w-4 h-4" />}
-                className="bg-sand/15 hover:bg-sand/25 text-sand border border-sand/30 backdrop-blur-xs shadow-soft"
+                className="bg-surface hover:bg-surface-solid text-text border border-border backdrop-blur-md shadow-soft"
               >
                 {t.routes.home.ctaContribute}
               </Button>
@@ -55,9 +55,9 @@ export default function HomePage() {
 
       <main className="relative z-10 flex-1 max-w-7xl w-full mx-auto px-5 sm:px-8 lg:px-10 py-12">
         {/* Quick Metrics & Collection Overview */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-line pb-6 mb-8">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-border pb-6 mb-8">
           <div>
-            <h2 className="font-serif text-2xl font-normal text-ink">
+            <h2 className="font-serif text-2xl font-normal text-text">
               {t.common.placesInCollection}
             </h2>
             <p className="text-xs sm:text-sm text-ink/65 mt-1">
@@ -138,10 +138,10 @@ export default function HomePage() {
         </div>
 
         {/* Action Callout Banner matching bottom of screenshot */}
-        <div className="p-5 rounded-card border border-line bg-[#FAF7F2] shadow-soft flex flex-col sm:flex-row items-center justify-between gap-4 mb-8">
+        <div className="p-5 glass shadow-soft flex flex-col sm:flex-row items-center justify-between gap-4 mb-8">
           <div className="flex items-center gap-3">
-            <span className="text-terracotta text-lg">✦</span>
-            <p className="text-xs sm:text-sm text-ink/75 font-serif italic">
+            <span className="text-accent text-lg">✦</span>
+            <p className="text-xs sm:text-sm text-text-muted font-serif italic">
               &quot;{t.common.quoteBanner}&quot;
             </p>
           </div>
@@ -157,56 +157,56 @@ export default function HomePage() {
         </div>
 
         {/* Route Index Hub */}
-        <div className="border border-line rounded-card p-8 bg-[#FAF7F2] shadow-soft">
-          <h2 className="font-serif text-lg font-semibold text-ink mb-2">
+        <div className="glass p-8 shadow-soft">
+          <h2 className="font-serif text-lg font-semibold text-text mb-2">
             Scaffolded Route Placeholders
           </h2>
-          <p className="text-xs text-ink/65 mb-4">
+          <p className="text-xs text-text-muted mb-4">
             Navbar, Footer, i18n English/Marathi switchers, and design tokens are active across all routes:
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
             <Link
               href="/explore"
-              className="p-4 rounded-control border border-line hover:border-terracotta bg-sand-50/80 hover:bg-[#FDFBF7] shadow-xs hover:shadow-soft hover:-translate-y-1 transition-all duration-300 ease-soft text-xs flex items-center justify-between group"
+              className="p-4 rounded-control border border-border hover:border-accent bg-surface hover:bg-surface-solid shadow-soft hover:-translate-y-1 transition-all duration-300 ease-soft text-xs flex items-center justify-between group"
             >
               <span className="font-medium flex items-center gap-2">
-                <Compass className="w-3.5 h-3.5 text-terracotta" />
+                <Compass className="w-3.5 h-3.5 text-accent" />
                 /explore
               </span>
-              <ArrowRight className="w-3.5 h-3.5 text-ink/40 group-hover:text-terracotta group-hover:translate-x-0.5 transition-all" />
+              <ArrowRight className="w-3.5 h-3.5 text-text-muted group-hover:text-accent group-hover:translate-x-0.5 transition-all" />
             </Link>
 
             <Link
               href="/search"
-              className="p-4 rounded-control border border-line hover:border-terracotta bg-sand-50/80 hover:bg-[#FDFBF7] shadow-xs hover:shadow-soft hover:-translate-y-1 transition-all duration-300 ease-soft text-xs flex items-center justify-between group"
+              className="p-4 rounded-control border border-border hover:border-accent bg-surface hover:bg-surface-solid shadow-soft hover:-translate-y-1 transition-all duration-300 ease-soft text-xs flex items-center justify-between group"
             >
               <span className="font-medium flex items-center gap-2">
-                <Search className="w-3.5 h-3.5 text-indigo" />
+                <Search className="w-3.5 h-3.5 text-accent" />
                 /search
               </span>
-              <ArrowRight className="w-3.5 h-3.5 text-ink/40 group-hover:text-terracotta group-hover:translate-x-0.5 transition-all" />
+              <ArrowRight className="w-3.5 h-3.5 text-text-muted group-hover:text-accent group-hover:translate-x-0.5 transition-all" />
             </Link>
 
             <Link
               href="/contribute"
-              className="p-4 rounded-control border border-line hover:border-terracotta bg-sand-50/80 hover:bg-[#FDFBF7] shadow-xs hover:shadow-soft hover:-translate-y-1 transition-all duration-300 ease-soft text-xs flex items-center justify-between group"
+              className="p-4 rounded-control border border-border hover:border-accent bg-surface hover:bg-surface-solid shadow-soft hover:-translate-y-1 transition-all duration-300 ease-soft text-xs flex items-center justify-between group"
             >
               <span className="font-medium flex items-center gap-2">
-                <PlusCircle className="w-3.5 h-3.5 text-green" />
+                <PlusCircle className="w-3.5 h-3.5 text-success" />
                 /contribute
               </span>
-              <ArrowRight className="w-3.5 h-3.5 text-ink/40 group-hover:text-terracotta group-hover:translate-x-0.5 transition-all" />
+              <ArrowRight className="w-3.5 h-3.5 text-text-muted group-hover:text-accent group-hover:translate-x-0.5 transition-all" />
             </Link>
 
             <Link
               href="/place/rani-ki-vav"
-              className="p-4 rounded-control border border-line hover:border-terracotta bg-sand-50/80 hover:bg-[#FDFBF7] shadow-xs hover:shadow-soft hover:-translate-y-1 transition-all duration-300 ease-soft text-xs flex items-center justify-between group"
+              className="p-4 rounded-control border border-border hover:border-accent bg-surface hover:bg-surface-solid shadow-soft hover:-translate-y-1 transition-all duration-300 ease-soft text-xs flex items-center justify-between group"
             >
               <span className="font-medium flex items-center gap-2">
-                <span className="text-gold">🏛</span>
+                <span className="text-accent-2">🏛</span>
                 /place/[id]
               </span>
-              <ArrowRight className="w-3.5 h-3.5 text-ink/40 group-hover:text-terracotta group-hover:translate-x-0.5 transition-all" />
+              <ArrowRight className="w-3.5 h-3.5 text-text-muted group-hover:text-accent group-hover:translate-x-0.5 transition-all" />
             </Link>
           </div>
         </div>

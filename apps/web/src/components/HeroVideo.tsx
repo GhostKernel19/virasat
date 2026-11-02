@@ -137,7 +137,7 @@ export function HeroVideo({ poster }: HeroVideoProps) {
       ) : (
         <div
           aria-hidden="true"
-          className="absolute inset-0 z-0 pointer-events-none bg-[var(--hero-brown-2)]"
+          className="absolute inset-0 z-0 pointer-events-none bg-[var(--bg-0)]"
         />
       )}
 

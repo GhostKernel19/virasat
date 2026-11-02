@@ -63,14 +63,14 @@ export function PlaceCard({
       onClick={onClick}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
-      className={`group relative flex items-start gap-4 p-4.5 rounded-card border transition-all duration-300 ease-soft text-left bg-[#FAF7F2] shadow-soft ${
+      className={`group relative flex items-start gap-4 p-4.5 rounded-card border transition-all duration-300 ease-soft text-left shadow-soft ${
         isSelected
-          ? "border-terracotta bg-[#FDFBF7] shadow-lift -translate-y-1 ring-1 ring-terracotta/20"
-          : "border-line hover:border-terracotta/60 hover:bg-[#FDFBF7] hover:shadow-lift hover:-translate-y-1"
+          ? "border-accent bg-surface-solid shadow-lift -translate-y-1 ring-1 ring-accent/30"
+          : "border-border bg-surface hover:border-accent/60 hover:bg-surface-solid hover:shadow-lift hover:-translate-y-1"
       } ${onClick || targetHref ? "cursor-pointer" : ""} ${className}`}
     >
       {/* Thumbnail */}
-      <div className="relative w-20 h-20 shrink-0 overflow-hidden rounded-control border border-line bg-sand-200/50">
+      <div className="relative w-20 h-20 shrink-0 overflow-hidden rounded-control border border-border bg-surface-solid">
         {!imageError && imageUrl ? (
           <Image
             src={imageUrl}
@@ -81,9 +81,9 @@ export function PlaceCard({
             onError={() => setImageError(true)}
           />
         ) : (
-          <div className="w-full h-full flex flex-col items-center justify-center text-ink/40 bg-sand-200/60 p-2">
-            <Landmark className="w-6 h-6 text-terracotta/60 mb-1" />
-            <span className="text-[9px] uppercase tracking-wider text-ink/50 text-center font-mono">
+          <div className="w-full h-full flex flex-col items-center justify-center text-text-muted bg-surface-solid p-2">
+            <Landmark className="w-6 h-6 text-accent/60 mb-1" />
+            <span className="text-[9px] uppercase tracking-wider text-text-muted text-center font-mono">
               Virasat
             </span>
           </div>
@@ -93,19 +93,19 @@ export function PlaceCard({
       {/* Details */}
       <div className="flex-1 min-w-0">
         <div className="flex items-start justify-between gap-1">
-          <h3 className="font-serif text-[17px] font-semibold text-ink leading-tight truncate group-hover:text-terracotta transition-colors">
+          <h3 className="font-serif text-[17px] font-semibold text-text leading-tight truncate group-hover:text-accent transition-colors">
             {displayTitle}
           </h3>
-          <span className="shrink-0 text-terracotta opacity-85 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all">
+          <span className="shrink-0 text-accent opacity-85 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all">
             <ArrowUpRight className="w-4 h-4" />
           </span>
         </div>
 
-        <p className="text-xs text-ink/70 mt-1 font-sans truncate">
+        <p className="text-xs text-text-muted mt-1 font-sans truncate">
           {location}
         </p>
 
-        <p className="text-[11px] text-ink/50 mt-0.5 font-sans truncate">
+        <p className="text-[11px] text-text-muted/80 mt-0.5 font-sans truncate">
           {century ? `${century} · ` : ""}
           {category}
         </p>
@@ -123,7 +123,7 @@ export function PlaceCard({
           )}
 
           {recordsCount > 0 && (
-            <span className="text-[11px] text-ink/60 font-sans">
+            <span className="text-[11px] text-text-muted font-sans">
               {recordsCount} {recordsCount === 1 ? t.common.recordSingular : t.common.records}
             </span>
           )}

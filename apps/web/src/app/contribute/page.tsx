@@ -360,21 +360,21 @@ export default function ContributePage() {
     switch (status) {
       case "running":
         return (
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-pill text-xs font-medium bg-amber-500/10 text-amber-700 border border-amber-300">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-pill text-xs font-medium bg-accent-2/15 text-accent-2 border border-accent-2/40">
             <Loader2 className="w-3 h-3 animate-spin" />
             {t.routes.contribute.statusRunning}
           </span>
         );
       case "done":
         return (
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-pill text-xs font-medium bg-green/10 text-green border border-green/30">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-pill text-xs font-medium bg-success/15 text-success border border-success/40">
             <CheckCircle2 className="w-3 h-3" />
             {t.routes.contribute.statusDone}
           </span>
         );
       case "failed":
         return (
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-pill text-xs font-medium bg-red-500/10 text-red-600 border border-red-300">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-pill text-xs font-medium bg-danger/15 text-danger border border-danger/40">
             <AlertCircle className="w-3 h-3" />
             {t.routes.contribute.statusFailed}
           </span>
@@ -382,7 +382,7 @@ export default function ContributePage() {
       case "pending":
       default:
         return (
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-pill text-xs font-medium bg-ink/5 text-ink/60 border border-line">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-pill text-xs font-medium bg-surface-solid text-text-muted border border-border">
             <Clock className="w-3 h-3" />
             {t.routes.contribute.statusPending}
           </span>
@@ -393,7 +393,7 @@ export default function ContributePage() {
   const failedJob = jobs.find((j) => j.status === "failed");
 
   return (
-    <div className="min-h-screen flex flex-col bg-sand text-ink">
+    <div className="min-h-screen flex flex-col text-text">
       <Navbar />
 
       <main className="flex-1 max-w-5xl w-full mx-auto px-5 sm:px-8 lg:px-10 py-10">
@@ -402,22 +402,22 @@ export default function ContributePage() {
           <Badge variant="ocr" size="sm" className="mb-2">
             {t.routes.contribute.badge}
           </Badge>
-          <h1 className="font-serif text-2xl sm:text-3xl font-semibold text-ink mb-1.5">
+          <h1 className="font-serif text-2xl sm:text-3xl font-semibold text-text mb-1.5">
             {t.routes.contribute.title}
           </h1>
-          <p className="text-sm text-ink/70">
+          <p className="text-sm text-text-muted">
             {t.routes.contribute.subtitle}
           </p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* Contribution Form */}
-          <div className="lg:col-span-6 bg-[#FAF7F2] rounded-card border border-line p-8 shadow-soft">
+          <div className="lg:col-span-6 glass p-8 shadow-soft">
             <form onSubmit={handleSubmit} className="space-y-5">
               {/* Image Upload Field */}
               <div>
-                <label className="block text-xs font-semibold text-ink uppercase tracking-wider mb-1.5">
-                  {t.routes.contribute.imageLabel} <span className="text-terracotta">*</span>
+                <label className="block text-xs font-semibold text-text uppercase tracking-wider mb-1.5">
+                  {t.routes.contribute.imageLabel} <span className="text-accent">*</span>
                 </label>
                 <input
                   ref={fileInputRef}
@@ -426,16 +426,16 @@ export default function ContributePage() {
                   required
                   disabled={isProcessing}
                   onChange={handleImageChange}
-                  className="w-full text-xs text-ink file:mr-3 file:py-2 file:px-4 file:rounded-control file:border-0 file:text-xs file:font-semibold file:bg-terracotta/10 file:text-terracotta hover:file:bg-terracotta/20 file:cursor-pointer cursor-pointer border border-line rounded-control p-2.5 bg-sand-50/80 focus:outline-none focus:ring-1 focus:ring-terracotta"
+                  className="w-full text-xs text-text file:mr-3 file:py-2 file:px-4 file:rounded-control file:border-0 file:text-xs file:font-semibold file:bg-accent/15 file:text-accent hover:file:bg-accent/25 file:cursor-pointer cursor-pointer border border-border rounded-control p-2.5 bg-surface-solid focus:outline-none focus:ring-1 focus:ring-accent"
                 />
-                <p className="mt-1 text-[11px] text-ink/60">
+                <p className="mt-1 text-[11px] text-text-muted">
                   {t.routes.contribute.imageHint}
                 </p>
 
                 {/* Image Preview */}
                 {imagePreview && (
-                  <div className="mt-3 p-4 bg-sand-50/90 border border-line rounded-control flex flex-col items-center">
-                    <div className="relative max-h-56 w-full flex items-center justify-center overflow-hidden rounded-control bg-ink/5">
+                  <div className="mt-3 p-4 bg-surface border border-border rounded-control flex flex-col items-center">
+                    <div className="relative max-h-56 w-full flex items-center justify-center overflow-hidden rounded-control bg-surface-solid">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={imagePreview}
@@ -444,7 +444,7 @@ export default function ContributePage() {
                       />
                     </div>
                     {imageFile && (
-                      <span className="mt-2 text-[11px] text-ink/70 font-mono truncate max-w-full">
+                      <span className="mt-2 text-[11px] text-text-muted font-mono truncate max-w-full">
                         {imageFile.name} ({(imageFile.size / 1024).toFixed(1)} KB)
                       </span>
                     )}
@@ -454,8 +454,8 @@ export default function ContributePage() {
 
               {/* Title Field */}
               <div>
-                <label className="block text-xs font-semibold text-ink uppercase tracking-wider mb-1.5">
-                  {t.routes.contribute.titleLabel} <span className="text-terracotta">*</span>
+                <label className="block text-xs font-semibold text-text uppercase tracking-wider mb-1.5">
+                  {t.routes.contribute.titleLabel} <span className="text-accent">*</span>
                 </label>
                 <input
                   type="text"
@@ -464,21 +464,21 @@ export default function ContributePage() {
                   disabled={isProcessing}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder={t.routes.contribute.titlePlaceholder}
-                  className="w-full px-4 py-2.5 text-sm bg-sand-50/80 border border-line rounded-control focus:outline-none focus:ring-1 focus:ring-terracotta focus:border-terracotta focus:bg-[#FDFBF7] disabled:opacity-50"
+                  className="w-full px-4 py-2.5 text-sm bg-surface-solid border border-border rounded-control focus:outline-none focus:ring-1 focus:ring-accent focus:border-accent focus:bg-surface text-text placeholder:text-text-muted disabled:opacity-50"
                 />
               </div>
 
               {/* Required Place Dropdown (No default selection) */}
               <div>
-                <label className="block text-xs font-semibold text-ink uppercase tracking-wider mb-1.5">
-                  {t.routes.contribute.placeLabel} <span className="text-terracotta">*</span>
+                <label className="block text-xs font-semibold text-text uppercase tracking-wider mb-1.5">
+                  {t.routes.contribute.placeLabel} <span className="text-accent">*</span>
                 </label>
                 <select
                   required
                   value={selectedPlaceId}
                   disabled={isProcessing || loadingPlaces}
                   onChange={(e) => setSelectedPlaceId(e.target.value)}
-                  className="w-full px-4 py-2.5 text-sm bg-sand-50/80 border border-line rounded-control focus:outline-none focus:ring-1 focus:ring-terracotta focus:border-terracotta focus:bg-[#FDFBF7] disabled:opacity-50"
+                  className="w-full px-4 py-2.5 text-sm bg-surface-solid border border-border rounded-control focus:outline-none focus:ring-1 focus:ring-accent focus:border-accent focus:bg-surface text-text disabled:opacity-50"
                 >
                   <option value="">
                     {loadingPlaces
@@ -492,22 +492,22 @@ export default function ContributePage() {
                   ))}
                 </select>
                 {placesError && (
-                  <p className="mt-1 text-xs text-red-600">{placesError}</p>
+                  <p className="mt-1 text-xs text-danger">{placesError}</p>
                 )}
               </div>
 
               {/* Form Validation Error */}
               {formError && (
-                <div className="p-4 bg-red-50 border border-red-200 rounded-control text-red-700 text-xs flex items-center gap-2">
-                  <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                <div className="p-4 bg-danger/10 border border-danger/30 rounded-control text-text text-xs flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4 text-danger flex-shrink-0" />
                   <span>{formError}</span>
                 </div>
               )}
 
               {/* API Submit Error */}
               {submitError && (
-                <div className="p-4 bg-red-50 border border-red-200 rounded-control text-red-700 text-xs flex items-center gap-2">
-                  <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                <div className="p-4 bg-danger/10 border border-danger/30 rounded-control text-text text-xs flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4 text-danger flex-shrink-0" />
                   <span>{submitError}</span>
                 </div>
               )}
@@ -545,21 +545,21 @@ export default function ContributePage() {
           {/* Pipeline Status & Results Section */}
           <div className="lg:col-span-6 space-y-6">
             {/* Pipeline Stage Tracker */}
-            <div className="bg-[#FAF7F2] rounded-card border border-line p-8 shadow-soft">
-              <div className="flex items-center justify-between pb-3 mb-4 border-b border-line">
-                <h2 className="font-semibold text-sm text-ink flex items-center gap-2">
-                  <FileText className="w-4 h-4 text-terracotta" />
+            <div className="glass p-8 shadow-soft">
+              <div className="flex items-center justify-between pb-3 mb-4 border-b border-border">
+                <h2 className="font-semibold text-sm text-text flex items-center gap-2">
+                  <FileText className="w-4 h-4 text-accent" />
                   {t.routes.contribute.pipelineTitle}
                 </h2>
-                <span className="text-xs font-mono text-ink/70">
-                  Elapsed: <strong className="text-ink">{elapsedSeconds}s</strong>
+                <span className="text-xs font-mono text-text-muted">
+                  Elapsed: <strong className="text-text">{elapsedSeconds}s</strong>
                 </span>
               </div>
 
               {/* Timeout Error */}
               {timeoutError && (
-                <div className="mb-4 p-4 bg-amber-50 border border-amber-200 rounded-control text-amber-800 text-xs flex items-start gap-2">
-                  <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5 text-amber-600" />
+                <div className="mb-4 p-4 bg-accent-2/15 border border-accent-2/40 rounded-control text-text text-xs flex items-start gap-2">
+                  <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5 text-accent-2" />
                   <div>
                     <strong>Pipeline Timeout:</strong> {t.routes.contribute.timeoutMessage}
                   </div>
@@ -568,13 +568,13 @@ export default function ContributePage() {
 
               {/* Stage Failure Banner */}
               {failedJob && (
-                <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-control text-red-700 text-xs flex items-start gap-2">
-                  <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5 text-red-600" />
+                <div className="mb-4 p-4 bg-danger/15 border border-danger/40 rounded-control text-text text-xs flex items-start gap-2">
+                  <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5 text-danger" />
                   <div>
-                    <div className="font-semibold">
+                    <div className="font-semibold text-danger">
                       Stage &quot;{failedJob.stage}&quot; failed:
                     </div>
-                    <div className="mt-0.5 break-words font-mono text-[11px]">
+                    <div className="mt-0.5 break-words font-mono text-[11px] text-text-muted">
                       {failedJob.error || "Execution failed unexpectedly."}
                     </div>
                   </div>
@@ -591,13 +591,13 @@ export default function ContributePage() {
                   return (
                     <div
                       key={stageKey}
-                      className="p-4 bg-sand-50/80 rounded-control border border-line flex items-center justify-between gap-3 shadow-xs"
+                      className="p-4 bg-surface-solid rounded-control border border-border flex items-center justify-between gap-3 shadow-soft"
                     >
                       <div>
-                        <div className="text-xs font-medium text-ink">
+                        <div className="text-xs font-medium text-text">
                           {getStageTitle(stageKey)}
                         </div>
-                        <div className="text-[11px] text-ink/50 font-mono mt-0.5">
+                        <div className="text-[11px] text-text-muted font-mono mt-0.5">
                           stage: <span className="font-semibold">{stageKey}</span> · elapsed: {stageSeconds}s
                         </div>
                       </div>
@@ -609,7 +609,7 @@ export default function ContributePage() {
               </div>
 
               {isProcessing && !timeoutError && (
-                <p className="mt-4 text-center text-xs text-ink/60 animate-pulse">
+                <p className="mt-4 text-center text-xs text-text-muted animate-pulse">
                   Polling pipeline every 2s... (auto-timeout after 3m)
                 </p>
               )}
@@ -617,15 +617,15 @@ export default function ContributePage() {
 
             {/* Results Display */}
             {resultItem && (
-              <div className="bg-[#FAF7F2] rounded-card border border-line p-8 shadow-soft space-y-5">
-                <div className="flex items-center justify-between pb-3 border-b border-line">
-                  <h2 className="font-semibold text-sm text-green flex items-center gap-1.5">
+              <div className="glass p-8 shadow-soft space-y-5">
+                <div className="flex items-center justify-between pb-3 border-b border-border">
+                  <h2 className="font-semibold text-sm text-success flex items-center gap-1.5">
                     <CheckCircle2 className="w-4 h-4" />
                     {t.routes.contribute.resultsTitle}
                   </h2>
                   <Link
                     href={`/place/${resultItem.place_id || selectedPlaceId}`}
-                    className="inline-flex items-center gap-1 text-xs font-medium text-indigo hover:text-indigo-light transition-colors"
+                    className="inline-flex items-center gap-1 text-xs font-medium text-accent hover:text-accent-strong transition-colors"
                   >
                     <MapPin className="w-3.5 h-3.5" />
                     {t.routes.contribute.viewPlace}
@@ -635,11 +635,11 @@ export default function ContributePage() {
 
                 {/* Uploaded Image */}
                 <div>
-                  <span className="block text-xs font-semibold text-ink uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                    <ImageIcon className="w-3.5 h-3.5 text-ink/60" />
+                  <span className="block text-xs font-semibold text-text uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                    <ImageIcon className="w-3.5 h-3.5 text-text-muted" />
                     Uploaded Archival Image
                   </span>
-                  <div className="relative max-h-64 w-full flex items-center justify-center overflow-hidden rounded-control border border-line bg-ink/5 p-2">
+                  <div className="relative max-h-64 w-full flex items-center justify-center overflow-hidden rounded-control border border-border bg-surface-solid p-2">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={resultItem.media?.[0]?.url || imagePreview || ""}
@@ -651,8 +651,8 @@ export default function ContributePage() {
 
                 {/* Generated Tags */}
                 <div>
-                  <span className="block text-xs font-semibold text-ink uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                    <Tag className="w-3.5 h-3.5 text-ink/60" />
+                  <span className="block text-xs font-semibold text-text uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                    <Tag className="w-3.5 h-3.5 text-text-muted" />
                     {t.routes.contribute.tagsLabel}
                   </span>
                   {resultItem.tags && resultItem.tags.length > 0 ? (
@@ -664,19 +664,19 @@ export default function ContributePage() {
                       ))}
                     </div>
                   ) : (
-                    <p className="text-xs text-ink/50 italic">No tags assigned</p>
+                    <p className="text-xs text-text-muted italic">No tags assigned</p>
                   )}
                 </div>
 
                 {/* Original Devanagari | English Translation Table */}
                 <div>
-                  <span className="block text-xs font-semibold text-ink uppercase tracking-wider mb-2">
+                  <span className="block text-xs font-semibold text-text uppercase tracking-wider mb-2">
                     Transcription & Translation
                   </span>
-                  <div className="overflow-x-auto rounded-control border border-line">
+                  <div className="overflow-x-auto rounded-control border border-border">
                     <table className="w-full text-left text-xs border-collapse">
                       <thead>
-                        <tr className="bg-sand-100 border-b border-line text-ink/70">
+                        <tr className="bg-surface border-b border-border text-text-muted">
                           <th className="py-2.5 px-3.5 font-semibold w-1/2">
                             {t.routes.contribute.devanagariHeader}
                           </th>
@@ -685,18 +685,18 @@ export default function ContributePage() {
                           </th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-line bg-white/50">
+                      <tbody className="divide-y divide-border/60 bg-transparent">
                         {buildLinePairs(resultItem).map((pair, idx) => (
-                          <tr key={idx} className="hover:bg-sand-50/50 transition-colors">
-                            <td className="py-3 px-3.5 font-devanagari text-ink font-medium leading-relaxed align-top">
+                          <tr key={idx} className="hover:bg-surface/50 transition-colors">
+                            <td className="py-3 px-3.5 font-devanagari text-text font-medium leading-relaxed align-top">
                               {pair.original}
                               {pair.confidence !== undefined && (
-                                <span className="block text-[10px] text-ink/40 font-mono mt-0.5">
+                                <span className="block text-[10px] text-text-muted/60 font-mono mt-0.5">
                                   conf: {(pair.confidence * 100).toFixed(0)}%
                                 </span>
                               )}
                             </td>
-                            <td className="py-3 px-3.5 text-ink/80 leading-relaxed align-top">
+                            <td className="py-3 px-3.5 text-text/80 leading-relaxed align-top">
                               {pair.translation}
                             </td>
                           </tr>

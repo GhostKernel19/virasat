@@ -1,18 +1,24 @@
 import type { Metadata } from "next";
-import { Fraunces, Inter, Mukta } from "next/font/google";
+import { Inter, Newsreader, Noto_Serif_Devanagari, Mukta } from "next/font/google";
 import "./globals.css";
 import { LanguageProvider } from "@/i18n";
 import { FallingLeaves } from "@/components/motion";
 
-const fraunces = Fraunces({
-  subsets: ["latin"],
-  variable: "--font-fraunces",
-  display: "swap",
-});
-
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
+  display: "swap",
+});
+
+const newsreader = Newsreader({
+  subsets: ["latin"],
+  variable: "--font-newsreader",
+  display: "swap",
+});
+
+const notoSerifDevanagari = Noto_Serif_Devanagari({
+  subsets: ["devanagari", "latin"],
+  variable: "--font-noto-serif-devanagari",
   display: "swap",
 });
 
@@ -40,9 +46,9 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${fraunces.variable} ${mukta.variable}`}
+      className={`${inter.variable} ${newsreader.variable} ${notoSerifDevanagari.variable} ${mukta.variable}`}
     >
-      <body className="bg-sand text-ink font-sans antialiased min-h-screen flex flex-col relative">
+      <body className="text-text font-sans antialiased min-h-screen flex flex-col relative selection:bg-accent selection:text-bg-0">
         <FallingLeaves />
         <LanguageProvider>{children}</LanguageProvider>
       </body>

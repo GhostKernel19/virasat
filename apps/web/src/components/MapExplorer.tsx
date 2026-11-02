@@ -80,23 +80,23 @@ export function MapExplorer({
         if (isSelected) {
           element.style.transform = "scale(1.32) translateY(-4px)";
           element.style.zIndex = "40";
-          if (svgPath) svgPath.setAttribute("fill", "#A74627"); // Deep terracotta
+          if (svgPath) svgPath.setAttribute("fill", "var(--accent-strong)");
           if (halo) {
             halo.style.opacity = "1";
-            halo.style.boxShadow = "0 0 0 7px rgba(198, 93, 59, 0.35)";
+            halo.style.boxShadow = "var(--glow)";
           }
         } else if (isHovered) {
           element.style.transform = "scale(1.24) translateY(-2px)";
           element.style.zIndex = "30";
-          if (svgPath) svgPath.setAttribute("fill", "#D77252"); // Light terracotta highlight
+          if (svgPath) svgPath.setAttribute("fill", "var(--accent)");
           if (halo) {
             halo.style.opacity = "1";
-            halo.style.boxShadow = "0 0 0 5px rgba(215, 114, 82, 0.3)";
+            halo.style.boxShadow = "var(--glow-sm)";
           }
         } else {
           element.style.transform = "scale(1) translateY(0)";
           element.style.zIndex = "10";
-          if (svgPath) svgPath.setAttribute("fill", "#C65D3B"); // Default terracotta
+          if (svgPath) svgPath.setAttribute("fill", "var(--accent)");
           if (halo) {
             halo.style.opacity = "0";
             halo.style.boxShadow = "none";
@@ -199,9 +199,9 @@ export function MapExplorer({
       el.innerHTML = `
         <div class="pin-inner relative w-full h-full flex flex-col items-center">
           <svg width="34" height="42" viewBox="0 0 34 42" fill="none" xmlns="http://www.w3.org/2000/svg" class="drop-shadow-md">
-            <path d="M17 1C8.716 1 2 7.716 2 16C2 26.5 17 40 17 40C17 40 32 26.5 32 16C32 7.716 25.284 1 17 1Z" fill="#C65D3B" stroke="#FAF7F2" stroke-width="2"/>
-            <path d="M12 20.5V16C12 13.24 14.24 11 17 11C19.76 11 22 13.24 22 16V20.5" stroke="#FAF7F2" stroke-width="2" stroke-linecap="round"/>
-            <line x1="12" y1="20.5" x2="22" y2="20.5" stroke="#FAF7F2" stroke-width="2"/>
+            <path d="M17 1C8.716 1 2 7.716 2 16C2 26.5 17 40 17 40C17 40 32 26.5 32 16C32 7.716 25.284 1 17 1Z" fill="var(--accent)" stroke="var(--bg-0)" stroke-width="2"/>
+            <path d="M12 20.5V16C12 13.24 14.24 11 17 11C19.76 11 22 13.24 22 16V20.5" stroke="var(--bg-0)" stroke-width="2" stroke-linecap="round"/>
+            <line x1="12" y1="20.5" x2="22" y2="20.5" stroke="var(--bg-0)" stroke-width="2"/>
           </svg>
           <div class="pin-halo absolute -inset-2 rounded-full pointer-events-none opacity-0 transition-opacity duration-200"></div>
         </div>
@@ -276,13 +276,13 @@ export function MapExplorer({
         transition={{ duration: shouldReduceMotion ? 0 : 0.85, ease: [0.16, 1, 0.3, 1] }}
         className="w-full h-full"
       >
-        <div ref={mapContainerRef} className="w-full h-full bg-sand-100" />
+        <div ref={mapContainerRef} className="w-full h-full bg-bg-1" />
       </motion.div>
 
       {/* Map watermark / badge */}
       <div className="absolute top-4 left-4 z-10 pointer-events-none">
-        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-white/85 backdrop-blur-sm border border-line text-[11px] font-medium text-ink/75 shadow-xs">
-          <Layers className="w-3.5 h-3.5 text-terracotta" />
+        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-control bg-surface-solid/85 backdrop-blur-sm border border-border text-[11px] font-medium text-text-muted shadow-soft">
+          <Layers className="w-3.5 h-3.5 text-accent" />
           <span>MapLibre GL · {places.length} {t.common.placesMapped}</span>
         </div>
       </div>
@@ -298,15 +298,15 @@ export function MapExplorer({
             transition={{ duration: shouldReduceMotion ? 0 : 0.28, ease: "easeOut" }}
             className="absolute bottom-4 left-4 right-4 z-20"
           >
-            <div className="p-5.5 rounded-card border border-line bg-[#FAF7F2]/95 backdrop-blur-md shadow-soft text-ink">
+            <div className="p-5.5 glass shadow-soft text-text">
               {/* Panel Top Bar */}
-              <div className="flex items-center justify-between pb-2 mb-3 border-b border-line/70">
+              <div className="flex items-center justify-between pb-2 mb-3 border-b border-border/70">
                 <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-pill bg-terracotta animate-pulse" />
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-terracotta font-mono">
+                  <span className="w-2 h-2 rounded-pill bg-accent animate-pulse" />
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-accent font-mono">
                     {t.routes.explore.selectedPlace}
                   </span>
-                  <span className="text-[11px] text-ink/40 font-mono">
+                  <span className="text-[11px] text-text-muted font-mono">
                     [{selectedPlace.lat.toFixed(4)}° N, {selectedPlace.lng.toFixed(4)}° E]
                   </span>
                 </div>
@@ -315,7 +315,7 @@ export function MapExplorer({
                   type="button"
                   onClick={() => setPanelDismissed(true)}
                   aria-label="Dismiss panel"
-                  className="p-1.5 rounded-control text-ink/50 hover:text-ink hover:bg-black/5 transition-all duration-300 ease-soft"
+                  className="p-1.5 rounded-control text-text-muted hover:text-text hover:bg-surface transition-all duration-300 ease-soft cursor-pointer"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -323,7 +323,7 @@ export function MapExplorer({
 
               {/* Panel Content Body */}
               <div className="flex items-start gap-3.5">
-                <div className="relative w-16 h-16 shrink-0 rounded-control overflow-hidden border border-line bg-sand-200 shadow-soft">
+                <div className="relative w-16 h-16 shrink-0 rounded-control overflow-hidden border border-border bg-surface-solid shadow-soft">
                   {selectedPlace.imageUrl ? (
                     <Image
                       src={selectedPlace.imageUrl}
@@ -333,15 +333,15 @@ export function MapExplorer({
                       className="object-cover"
                     />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center text-ink/40">
-                      <Landmark className="w-6 h-6 text-terracotta/60" />
+                    <div className="w-full h-full flex items-center justify-center text-text-muted">
+                      <Landmark className="w-6 h-6 text-accent/60" />
                     </div>
                   )}
                 </div>
 
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <h3 className="font-serif text-base font-semibold text-ink truncate">
+                    <h3 className="font-serif text-base font-semibold text-text truncate">
                       {displaySelectedTitle}
                     </h3>
                     {selectedPlace.hasOcr && (
@@ -355,20 +355,20 @@ export function MapExplorer({
                     )}
                   </div>
 
-                  <p className="text-xs text-ink/70 mt-0.5 truncate">
+                  <p className="text-xs text-text-muted mt-0.5 truncate">
                     {selectedPlace.region ? `${selectedPlace.region}, ` : ""}
                     {selectedPlace.state} · {selectedPlace.period} · {selectedPlace.category}
                   </p>
 
-                  <p className="text-xs text-ink/80 mt-1 line-clamp-2 leading-relaxed">
+                  <p className="text-xs text-text/80 mt-1 line-clamp-2 leading-relaxed">
                     {selectedPlace.summary}
                   </p>
                 </div>
               </div>
 
               {/* Action Footer */}
-              <div className="mt-3 pt-2.5 border-t border-line/60 flex items-center justify-between">
-                <span className="text-[11px] text-ink/60">
+              <div className="mt-3 pt-2.5 border-t border-border/60 flex items-center justify-between">
+                <span className="text-[11px] text-text-muted">
                   {selectedPlace.recordsCount} {t.common.records}
                 </span>
 

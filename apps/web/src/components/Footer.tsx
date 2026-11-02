@@ -31,33 +31,33 @@ export function Footer({ pageCode, className = "" }: FooterProps) {
 
   return (
     <footer
-      className={`w-full border-t border-line bg-sand py-6 px-5 sm:px-8 lg:px-10 mt-auto text-xs text-ink/65 ${className}`}
+      className={`w-full border-t border-border bg-bg-0/80 backdrop-blur-md py-6 px-5 sm:px-8 lg:px-10 mt-auto text-xs text-text-muted ${className}`}
     >
       <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
         {/* Left: Brand prefix and heritage atlas tagline */}
-        <div className="flex items-center gap-2 text-ink/75">
-          <span className="font-semibold text-ink font-serif">
+        <div className="flex items-center gap-2 text-text/80">
+          <span className="font-semibold text-text font-serif">
             {t.footer.brandPrefix}
           </span>
-          <span className="text-line-dark select-none">/</span>
+          <span className="text-border select-none">/</span>
           <span>{t.footer.tagline}</span>
         </div>
 
         {/* Right: Sources & Attribution and Page Indicator */}
-        <div className="flex items-center gap-6 text-ink/70">
+        <div className="flex items-center gap-6 text-text-muted">
           <button
             type="button"
             onClick={() => {
               alert("Virasat Heritage Atlas — Sources include Archaeological Survey of India (ASI) public archives, Gazetteers, and community contributions.");
             }}
-            className="hover:text-ink transition-colors underline-offset-2 hover:underline cursor-pointer"
+            className="hover:text-text transition-colors underline-offset-2 hover:underline cursor-pointer"
           >
             {t.footer.sourcesAndAttribution}
           </button>
 
-          <span className="text-line-dark select-none hidden sm:inline">|</span>
+          <span className="text-border select-none hidden sm:inline">|</span>
 
-          <span className="font-mono text-[11px] tracking-wider text-ink/80 font-medium uppercase">
+          <span className="font-mono text-[11px] tracking-wider text-text font-medium uppercase">
             {currentPageCode}
           </span>
         </div>

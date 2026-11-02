@@ -36,40 +36,40 @@ export function Badge({
   switch (variant) {
     case "filterActive":
       variantClasses =
-        "bg-ink text-sand border border-ink shadow-sm font-medium";
+        "bg-accent text-bg-0 border border-accent shadow-glow font-medium";
       break;
     case "filter":
       variantClasses =
-        "bg-sand-50/90 border border-line text-ink/80 hover:text-ink hover:border-ink/30 font-normal";
+        "bg-surface border border-border text-text/80 hover:text-text hover:border-accent/40 font-normal";
       break;
     case "ocr":
       variantClasses =
-        "bg-sand-50/90 border border-green/30 text-green font-medium shadow-2xs";
+        "bg-surface border border-success/30 text-success font-medium";
       break;
     case "illustrative":
       variantClasses =
-        "bg-gold/15 border border-gold/40 text-gold-dark font-medium tracking-wider uppercase text-[10px]";
+        "bg-accent-2/15 border border-accent-2/40 text-accent-2 font-medium tracking-wider uppercase text-[10px]";
       break;
     case "terracotta":
       variantClasses =
-        "bg-terracotta/10 border border-terracotta/20 text-terracotta font-medium";
+        "bg-accent/15 border border-accent/30 text-accent font-medium";
       break;
     case "indigo":
       variantClasses =
-        "bg-indigo/10 border border-indigo/20 text-indigo font-medium";
+        "bg-accent/15 border border-accent/30 text-accent font-medium";
       break;
     case "gold":
       variantClasses =
-        "bg-gold/15 border border-gold/30 text-gold-dark font-medium";
+        "bg-accent-2/15 border border-accent-2/30 text-accent-2 font-medium";
       break;
     case "outline":
       variantClasses =
-        "border border-line text-ink/70 bg-transparent";
+        "border border-border text-text-muted bg-transparent";
       break;
     case "default":
     default:
       variantClasses =
-        "bg-sand-200/80 border border-line text-ink";
+        "bg-surface-solid border border-border text-text";
       break;
   }
 

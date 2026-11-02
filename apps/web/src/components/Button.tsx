@@ -40,23 +40,23 @@ export function Button({
   switch (variant) {
     case "primary":
       variantClasses =
-        "bg-terracotta hover:bg-terracotta-dark text-sand shadow-sm hover:shadow-soft transition-all duration-300 ease-soft active:scale-[0.98] font-medium";
+        "bg-accent hover:bg-accent-strong text-bg-0 shadow-soft hover:shadow-glow active:scale-[0.98] font-medium";
       break;
     case "secondary":
       variantClasses =
-        "bg-indigo hover:bg-indigo-light text-sand shadow-sm hover:shadow-soft transition-all duration-300 ease-soft active:scale-[0.98] font-medium";
+        "bg-surface-solid hover:bg-surface text-text border border-border hover:border-accent shadow-soft active:scale-[0.98] font-medium";
       break;
     case "outline":
       variantClasses =
-        "border border-line hover:border-terracotta hover:text-terracotta text-ink bg-sand-50/90 hover:bg-surface shadow-2xs hover:shadow-soft transition-all duration-300 ease-soft font-medium";
+        "border border-border hover:border-accent hover:text-accent text-text bg-surface hover:bg-surface-solid shadow-soft font-medium";
       break;
     case "ghost":
       variantClasses =
-        "text-ink/80 hover:text-ink hover:bg-sand-200/70 transition-all duration-300 ease-soft font-medium";
+        "text-text/80 hover:text-text hover:bg-surface font-medium";
       break;
     case "link":
       variantClasses =
-        "text-terracotta hover:text-terracotta-dark underline-offset-4 hover:underline p-0 font-medium transition-all duration-300 ease-soft";
+        "text-accent hover:text-accent-strong underline-offset-4 hover:underline p-0 font-medium transition-all duration-300 ease-soft";
       sizeClasses = "text-sm gap-1";
       break;
   }
