@@ -19,16 +19,16 @@ interface LeafConfig {
 
 const LEAVES_CONFIG: LeafConfig[] = [
   { id: 1, type: "bodhi", colorVar: "var(--accent)", size: 18, initialLeft: 8, baseOpacity: 0.22, fallDuration: 13, swayDuration: 3.2, swayDistance: 45, delay: 0 },
-  { id: 2, type: "mango", colorVar: "var(--success)", size: 20, initialLeft: 18, baseOpacity: 0.18, fallDuration: 16, swayDuration: 4.1, swayDistance: 50, delay: 2.5 },
-  { id: 3, type: "neem", colorVar: "var(--accent-2)", size: 15, initialLeft: 27, baseOpacity: 0.25, fallDuration: 11, swayDuration: 2.8, swayDistance: 35, delay: 5.0 },
-  { id: 4, type: "bodhi", colorVar: "var(--success)", size: 17, initialLeft: 38, baseOpacity: 0.20, fallDuration: 14, swayDuration: 3.6, swayDistance: 40, delay: 1.2 },
+  { id: 2, type: "mango", colorVar: "var(--accent-2)", size: 20, initialLeft: 18, baseOpacity: 0.18, fallDuration: 16, swayDuration: 4.1, swayDistance: 50, delay: 2.5 },
+  { id: 3, type: "neem", colorVar: "var(--accent)", size: 15, initialLeft: 27, baseOpacity: 0.25, fallDuration: 11, swayDuration: 2.8, swayDistance: 35, delay: 5.0 },
+  { id: 4, type: "bodhi", colorVar: "var(--accent-2)", size: 17, initialLeft: 38, baseOpacity: 0.20, fallDuration: 14, swayDuration: 3.6, swayDistance: 40, delay: 1.2 },
   { id: 5, type: "mango", colorVar: "var(--accent)", size: 22, initialLeft: 49, baseOpacity: 0.16, fallDuration: 17, swayDuration: 4.5, swayDistance: 55, delay: 7.0 },
   { id: 6, type: "neem", colorVar: "var(--accent-2)", size: 14, initialLeft: 58, baseOpacity: 0.24, fallDuration: 12, swayDuration: 3.0, swayDistance: 30, delay: 3.8 },
   { id: 7, type: "bodhi", colorVar: "var(--accent-strong)", size: 19, initialLeft: 67, baseOpacity: 0.22, fallDuration: 15, swayDuration: 3.8, swayDistance: 48, delay: 6.2 },
-  { id: 8, type: "mango", colorVar: "var(--success)", size: 21, initialLeft: 76, baseOpacity: 0.19, fallDuration: 18, swayDuration: 4.2, swayDistance: 52, delay: 0.8 },
-  { id: 9, type: "neem", colorVar: "var(--accent-2)", size: 16, initialLeft: 84, baseOpacity: 0.23, fallDuration: 13, swayDuration: 3.4, swayDistance: 38, delay: 4.4 },
+  { id: 8, type: "mango", colorVar: "var(--accent-2)", size: 21, initialLeft: 76, baseOpacity: 0.19, fallDuration: 18, swayDuration: 4.2, swayDistance: 52, delay: 0.8 },
+  { id: 9, type: "neem", colorVar: "var(--accent)", size: 16, initialLeft: 84, baseOpacity: 0.23, fallDuration: 13, swayDuration: 3.4, swayDistance: 38, delay: 4.4 },
   { id: 10, type: "bodhi", colorVar: "var(--accent-2)", size: 18, initialLeft: 92, baseOpacity: 0.20, fallDuration: 15, swayDuration: 3.9, swayDistance: 42, delay: 2.1 },
-  { id: 11, type: "mango", colorVar: "var(--accent)", size: 17, initialLeft: 96, baseOpacity: 0.17, fallDuration: 16, swayDuration: 3.5, swayDistance: 46, delay: 8.0 },
+  { id: 11, type: "mango", colorVar: "var(--accent-strong)", size: 17, initialLeft: 96, baseOpacity: 0.17, fallDuration: 16, swayDuration: 3.5, swayDistance: 46, delay: 8.0 },
 ];
 
 function LeafSVG({ type, colorVar }: { type: LeafConfig["type"]; colorVar: string }) {

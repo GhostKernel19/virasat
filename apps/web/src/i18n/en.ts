@@ -48,6 +48,19 @@ export interface TranslationDictionary {
       badge: string;
       ctaExplore: string;
       ctaContribute: string;
+      livingAtlas: string;
+      tagline: string;
+      headline: string;
+      description: string;
+      ctaExploreMap: string;
+      ctaEnterAtlas: string;
+      ctaContributeRecord: string;
+      bottomBarLeft: string;
+      scrollToDiscover: string;
+      introLabel: string;
+      introTitle: string;
+      introParagraph: string;
+      addToAtlasAction: string;
     };
     explore: {
       title: string;
@@ -179,6 +192,19 @@ export const en: TranslationDictionary = {
       badge: "PLACES REMEMBER. RECORDS CONNECT.",
       ctaExplore: "Launch Explore Atlas",
       ctaContribute: "Contribute Record",
+      livingAtlas: "A LIVING HERITAGE ATLAS",
+      tagline: "PLACES REMEMBER. RECORDS CONNECT.",
+      headline: "From archival graveyard to living heritage map.",
+      description: "A collaborative digital map documenting the stone, the stories, and the lived memories of India's historical landmarks.",
+      ctaExploreMap: "Explore the map",
+      ctaEnterAtlas: "Enter the atlas",
+      ctaContributeRecord: "Contribute a record",
+      bottomBarLeft: "VIRASAT / AN OPEN ATLAS OF PLACES, RECORDS AND MEMORY.",
+      scrollToDiscover: "SCROLL TO DISCOVER",
+      introLabel: "PLACES REMEMBER. RECORDS CONNECT.",
+      introTitle: "From archival graveyard to living heritage map",
+      introParagraph: "Follow a place from stone to story. Explore monuments, read records, and add what you know.",
+      addToAtlasAction: "Add to the atlas →",
     },
     explore: {
       title: "Living Heritage Atlas — Spatial Discovery",

@@ -167,7 +167,7 @@ textarea,
   transition-duration: var(--duration);
 }
 
-/* Card hover lift by 4px with shadow-lift */
+/* Card hover lift by 4px with shadow-lift & soft accent glow */
 .card-lift,
 .place-card-item {
   box-shadow: var(--shadow-soft);
@@ -179,7 +179,8 @@ textarea,
 .card-lift:hover,
 .place-card-item:hover {
   transform: translateY(-4px);
-  box-shadow: var(--shadow-lift);
+  border-color: rgba(245, 230, 211, 0.35);
+  box-shadow: var(--shadow-lift), 0 0 24px rgba(232, 131, 74, 0.25);
 }
 
 /* =========================================================================

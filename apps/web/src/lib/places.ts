@@ -1,7 +1,7 @@
 import { supabase, PlaceRecord } from "./supabase";
 import { Place } from "@/types/place";
 
-const FALLBACK_PLACES: Place[] = [
+export const FALLBACK_PLACES: Place[] = [
   {
     id: "11111111-1111-4111-a111-111111111111",
     slug: "rani-ki-vav",

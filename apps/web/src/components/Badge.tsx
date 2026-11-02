@@ -28,27 +28,27 @@ export function Badge({
 }: BadgeProps) {
   const sizeClasses =
     size === "sm"
-      ? "text-[11px] px-2.5 py-1 gap-1"
-      : "text-xs px-3.5 py-1.5 gap-1.5";
+      ? "text-[11px] px-2.5 py-0.5 gap-1"
+      : "text-xs px-3 py-1 gap-1.5";
 
   let variantClasses = "";
 
   switch (variant) {
+    case "ocr":
+      variantClasses =
+        "bg-success/15 border border-success/30 text-success font-medium";
+      break;
+    case "illustrative":
+      variantClasses =
+        "bg-accent-2/15 border border-accent-2/30 text-accent-2 font-medium tracking-wider uppercase text-[10px]";
+      break;
     case "filterActive":
       variantClasses =
         "bg-accent text-bg-0 border border-accent shadow-glow font-medium";
       break;
     case "filter":
       variantClasses =
-        "bg-surface border border-border text-text/80 hover:text-text hover:border-accent/40 font-normal";
-      break;
-    case "ocr":
-      variantClasses =
-        "bg-surface border border-success/30 text-success font-medium";
-      break;
-    case "illustrative":
-      variantClasses =
-        "bg-accent-2/15 border border-accent-2/40 text-accent-2 font-medium tracking-wider uppercase text-[10px]";
+        "bg-transparent border border-border text-text-muted hover:text-text hover:border-text/40 hover:bg-surface/30 font-normal";
       break;
     case "terracotta":
       variantClasses =
@@ -64,7 +64,7 @@ export function Badge({
       break;
     case "outline":
       variantClasses =
-        "border border-border text-text-muted bg-transparent";
+        "bg-transparent border border-border text-text-muted";
       break;
     case "default":
     default:
