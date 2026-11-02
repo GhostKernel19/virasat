@@ -235,12 +235,8 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* =========================================================================
-   Hero Section Video Filter, Overlays & Typography
+   Hero Section Overlays & Typography
    ========================================================================= */
-.hero-video-filter {
-  filter: brightness(0.65) contrast(1.15) sepia(0.35) saturate(1.1);
-}
-
 .hero-radial-overlay {
   background: radial-gradient(ellipse at center, var(--hero-brown-1) 0%, var(--hero-brown-2) 100%);
   opacity: 0.70;

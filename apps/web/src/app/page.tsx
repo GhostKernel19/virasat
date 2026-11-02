@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { Navbar, Footer, Badge, Button, PlaceCard, HeroVideo } from "@/components";
+import { Navbar, Footer, Badge, Button, PlaceCard } from "@/components";
 import { useLanguage } from "@/i18n";
 import { ArrowRight, Compass, Search, PlusCircle } from "lucide-react";
 
@@ -15,7 +15,15 @@ export default function HomePage() {
 
       {/* Hero Section */}
       <section className="relative overflow-hidden isolate w-full py-24 sm:py-32 lg:py-40 px-5 sm:px-8 lg:px-10 flex flex-col items-center justify-center text-center">
-        <HeroVideo />
+        {/* Temporary dark gradient background */}
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 z-0 pointer-events-none hero-radial-overlay"
+        />
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 z-0 pointer-events-none hero-tint-overlay"
+        />
 
         {/* Hero Text and CTAs */}
         <div className="relative z-10 max-w-4xl mx-auto flex flex-col items-center">

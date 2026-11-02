@@ -389,11 +389,9 @@ export default function PlaceDetailPage({ params }: PlaceDetailPageProps) {
                         </p>
                       ) : (
                         ocrList.map((ocr) => {
-                          const rawLines =
+                          const rawLines: OCRLine[] =
                             Array.isArray(ocr.lines) && ocr.lines.length > 0
                               ? ocr.lines
-                              : ocr.original_text
-                              ? ocr.original_text
                               : [];
 
                           const translationText = ocr.translations?.[0]?.text || "";
