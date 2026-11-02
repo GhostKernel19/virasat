@@ -8,6 +8,7 @@ import { supabase, PlaceRecord } from "@/lib/supabase";
 import {
   UploadCloud,
   CheckCircle2,
+  Check,
   Clock,
   AlertCircle,
   Loader2,
@@ -391,18 +392,40 @@ export default function ContributePage() {
   };
 
   const failedJob = jobs.find((j) => j.status === "failed");
+  const completedStages = STAGE_ORDER.filter((stageKey) => {
+    const job = jobs.find((j) => j.stage === stageKey);
+    return job && job.status === "done";
+  }).length;
+  const progressPercent = Math.round((completedStages / STAGE_ORDER.length) * 100);
 
   return (
-    <div className="min-h-screen flex flex-col text-text">
+    <div className="min-h-screen flex flex-col text-text bg-bg-0 relative">
+      {/* Background with library-map.webp darkened with rgba(21,9,4,0.88) and blurred 6px */}
+      <div
+        aria-hidden="true"
+        className="fixed inset-0 z-0 overflow-hidden pointer-events-none select-none"
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/images/library-map.webp"
+          alt=""
+          className="w-full h-full object-cover filter blur-[6px] scale-105 opacity-70"
+        />
+        <div
+          className="absolute inset-0"
+          style={{ backgroundColor: "rgba(21, 9, 4, 0.88)" }}
+        />
+      </div>
+
       <Navbar />
 
-      <main className="flex-1 max-w-5xl w-full mx-auto px-5 sm:px-8 lg:px-10 py-10">
+      <main className="relative z-10 flex-1 max-w-5xl w-full mx-auto px-5 sm:px-8 lg:px-10 py-10">
         {/* Header */}
         <div className="mb-8">
           <Badge variant="ocr" size="sm" className="mb-2">
             {t.routes.contribute.badge}
           </Badge>
-          <h1 className="font-serif text-2xl sm:text-3xl font-semibold text-text mb-1.5">
+          <h1 className="font-serif text-3xl sm:text-4xl font-normal text-text mb-1.5">
             {t.routes.contribute.title}
           </h1>
           <p className="text-sm text-text-muted">
@@ -412,7 +435,7 @@ export default function ContributePage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* Contribution Form */}
-          <div className="lg:col-span-6 glass p-8 shadow-soft">
+          <div className="lg:col-span-6 glass p-7 sm:p-8 rounded-card shadow-soft">
             <form onSubmit={handleSubmit} className="space-y-5">
               {/* Image Upload Field */}
               <div>
@@ -426,7 +449,7 @@ export default function ContributePage() {
                   required
                   disabled={isProcessing}
                   onChange={handleImageChange}
-                  className="w-full text-xs text-text file:mr-3 file:py-2 file:px-4 file:rounded-control file:border-0 file:text-xs file:font-semibold file:bg-accent/15 file:text-accent hover:file:bg-accent/25 file:cursor-pointer cursor-pointer border border-border rounded-control p-2.5 bg-surface-solid focus:outline-none focus:ring-1 focus:ring-accent"
+                  className="w-full text-xs text-text file:mr-3 file:py-2 file:px-4 file:rounded-control file:border-0 file:text-xs file:font-semibold file:bg-accent/20 file:text-accent hover:file:bg-accent/30 file:cursor-pointer cursor-pointer border border-border rounded-control p-2.5 bg-surface-solid/80 focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-all duration-300 ease-soft"
                 />
                 <p className="mt-1 text-[11px] text-text-muted">
                   {t.routes.contribute.imageHint}
@@ -464,7 +487,7 @@ export default function ContributePage() {
                   disabled={isProcessing}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder={t.routes.contribute.titlePlaceholder}
-                  className="w-full px-4 py-2.5 text-sm bg-surface-solid border border-border rounded-control focus:outline-none focus:ring-1 focus:ring-accent focus:border-accent focus:bg-surface text-text placeholder:text-text-muted disabled:opacity-50"
+                  className="w-full px-4 py-2.5 text-sm bg-surface-solid/80 border border-border rounded-control focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent text-text placeholder:text-text-muted disabled:opacity-50 transition-all duration-300 ease-soft"
                 />
               </div>
 
@@ -478,7 +501,7 @@ export default function ContributePage() {
                   value={selectedPlaceId}
                   disabled={isProcessing || loadingPlaces}
                   onChange={(e) => setSelectedPlaceId(e.target.value)}
-                  className="w-full px-4 py-2.5 text-sm bg-surface-solid border border-border rounded-control focus:outline-none focus:ring-1 focus:ring-accent focus:border-accent focus:bg-surface text-text disabled:opacity-50"
+                  className="w-full px-4 py-2.5 text-sm bg-surface-solid/80 border border-border rounded-control focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent text-text disabled:opacity-50 transition-all duration-300 ease-soft"
                 >
                   <option value="">
                     {loadingPlaces
@@ -545,8 +568,8 @@ export default function ContributePage() {
           {/* Pipeline Status & Results Section */}
           <div className="lg:col-span-6 space-y-6">
             {/* Pipeline Stage Tracker */}
-            <div className="glass p-8 shadow-soft">
-              <div className="flex items-center justify-between pb-3 mb-4 border-b border-border">
+            <div className="glass p-7 sm:p-8 rounded-card shadow-soft">
+              <div className="flex items-center justify-between pb-3 mb-5 border-b border-border">
                 <h2 className="font-semibold text-sm text-text flex items-center gap-2">
                   <FileText className="w-4 h-4 text-accent" />
                   {t.routes.contribute.pipelineTitle}
@@ -554,6 +577,20 @@ export default function ContributePage() {
                 <span className="text-xs font-mono text-text-muted">
                   Elapsed: <strong className="text-text">{elapsedSeconds}s</strong>
                 </span>
+              </div>
+
+              {/* Progress Bar */}
+              <div className="mb-6">
+                <div className="flex items-center justify-between text-xs font-mono text-text-muted mb-2">
+                  <span className="uppercase tracking-wider text-[11px]">Pipeline Progress</span>
+                  <span className="text-accent font-semibold">{progressPercent}%</span>
+                </div>
+                <div className="w-full h-2 rounded-pill bg-surface border border-border overflow-hidden">
+                  <div
+                    className="h-full bg-gradient-to-r from-accent to-accent-strong transition-all duration-500 ease-soft shadow-glow"
+                    style={{ width: `${progressPercent}%` }}
+                  />
+                </div>
               </div>
 
               {/* Timeout Error */}
@@ -581,28 +618,52 @@ export default function ContributePage() {
                 </div>
               )}
 
-              {/* Stage List */}
-              <div className="space-y-3">
+              {/* Stage List as Vertical Timeline */}
+              <div className="relative pl-7 space-y-4 before:absolute before:left-3 before:top-4 before:bottom-4 before:w-0.5 before:bg-border/60">
                 {STAGE_ORDER.map((stageKey) => {
                   const job = jobs.find((j) => j.stage === stageKey);
                   const stageStatus = job ? job.status : "pending";
                   const stageSeconds = getStageElapsed(job);
+                  const isDone = stageStatus === "done";
+                  const isRunning = stageStatus === "running";
+                  const isFailed = stageStatus === "failed";
 
                   return (
-                    <div
-                      key={stageKey}
-                      className="p-4 bg-surface-solid rounded-control border border-border flex items-center justify-between gap-3 shadow-soft"
-                    >
-                      <div>
-                        <div className="text-xs font-medium text-text">
-                          {getStageTitle(stageKey)}
-                        </div>
-                        <div className="text-[11px] text-text-muted font-mono mt-0.5">
-                          stage: <span className="font-semibold">{stageKey}</span> · elapsed: {stageSeconds}s
-                        </div>
-                      </div>
+                    <div key={stageKey} className="relative">
+                      {/* Timeline Dot */}
+                      <span className="absolute -left-7 top-3 flex items-center justify-center -translate-x-1/2">
+                        {isDone ? (
+                          <span className="w-6 h-6 rounded-full bg-surface-solid border border-accent flex items-center justify-center text-accent shadow-glow">
+                            <Check className="w-3.5 h-3.5 text-accent drop-shadow-[0_0_8px_rgba(232,131,74,0.9)]" />
+                          </span>
+                        ) : isRunning ? (
+                          <span className="w-6 h-6 rounded-full bg-surface-solid border-2 border-accent flex items-center justify-center shadow-glow animate-pulse">
+                            <span className="w-2.5 h-2.5 rounded-full bg-accent" />
+                          </span>
+                        ) : isFailed ? (
+                          <span className="w-6 h-6 rounded-full bg-surface-solid border border-danger flex items-center justify-center text-danger">
+                            <AlertCircle className="w-3.5 h-3.5 text-danger" />
+                          </span>
+                        ) : (
+                          <span className="w-6 h-6 rounded-full bg-surface-solid border border-border flex items-center justify-center">
+                            <span className="w-2 h-2 rounded-full bg-border" />
+                          </span>
+                        )}
+                      </span>
 
-                      <div>{renderStatusBadge(stageStatus)}</div>
+                      {/* Stage Card */}
+                      <div className="p-4 bg-surface-solid/80 rounded-control border border-border flex items-center justify-between gap-3 shadow-soft hover:border-accent/40 transition-colors">
+                        <div>
+                          <div className="text-xs font-medium text-text">
+                            {getStageTitle(stageKey)}
+                          </div>
+                          <div className="text-[11px] text-text-muted font-mono mt-0.5">
+                            stage: <span className="font-semibold text-text">{stageKey}</span> · elapsed: {stageSeconds}s
+                          </div>
+                        </div>
+
+                        <div>{renderStatusBadge(stageStatus)}</div>
+                      </div>
                     </div>
                   );
                 })}
@@ -617,7 +678,7 @@ export default function ContributePage() {
 
             {/* Results Display */}
             {resultItem && (
-              <div className="glass p-8 shadow-soft space-y-5">
+              <div className="glass p-7 sm:p-8 rounded-card shadow-soft space-y-5">
                 <div className="flex items-center justify-between pb-3 border-b border-border">
                   <h2 className="font-semibold text-sm text-success flex items-center gap-1.5">
                     <CheckCircle2 className="w-4 h-4" />
@@ -673,30 +734,33 @@ export default function ContributePage() {
                   <span className="block text-xs font-semibold text-text uppercase tracking-wider mb-2">
                     Transcription & Translation
                   </span>
-                  <div className="overflow-x-auto rounded-control border border-border">
+                  <div className="overflow-x-auto rounded-control border border-border bg-surface-solid/80 shadow-soft">
                     <table className="w-full text-left text-xs border-collapse">
                       <thead>
-                        <tr className="bg-surface border-b border-border text-text-muted">
-                          <th className="py-2.5 px-3.5 font-semibold w-1/2">
+                        <tr className="bg-surface/80 border-b border-border text-[11px] font-semibold uppercase tracking-wider text-text-muted">
+                          <th className="py-2.5 px-3.5 w-1/2">
                             {t.routes.contribute.devanagariHeader}
                           </th>
-                          <th className="py-2.5 px-3.5 font-semibold w-1/2">
+                          <th className="py-2.5 px-3.5 w-1/2">
                             {t.routes.contribute.translationHeader}
                           </th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-border/60 bg-transparent">
+                      <tbody className="divide-y divide-border/60 text-sm">
                         {buildLinePairs(resultItem).map((pair, idx) => (
-                          <tr key={idx} className="hover:bg-surface/50 transition-colors">
-                            <td className="py-3 px-3.5 font-devanagari text-text font-medium leading-relaxed align-top">
+                          <tr
+                            key={idx}
+                            className="group hover:bg-accent/10 transition-colors border-l-2 border-transparent hover:border-accent"
+                          >
+                            <td className="py-3 px-3.5 font-devanagari text-text font-medium leading-relaxed align-top group-hover:text-accent transition-colors">
                               {pair.original}
                               {pair.confidence !== undefined && (
-                                <span className="block text-[10px] text-text-muted/60 font-mono mt-0.5">
+                                <span className="inline-block ml-2 text-[10px] font-mono px-2 py-0.5 rounded-pill bg-surface text-accent-2 border border-border">
                                   conf: {(pair.confidence * 100).toFixed(0)}%
                                 </span>
                               )}
                             </td>
-                            <td className="py-3 px-3.5 text-text/80 leading-relaxed align-top">
+                            <td className="py-3 px-3.5 font-sans text-xs text-text/85 leading-relaxed align-top">
                               {pair.translation}
                             </td>
                           </tr>

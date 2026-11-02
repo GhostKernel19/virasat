@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { Navbar, Footer, Badge, Button } from "@/components";
+import { Navbar, Footer, Badge, Button, Chip } from "@/components";
 import { useLanguage } from "@/i18n";
 import {
   ShieldCheck,
@@ -108,10 +108,27 @@ export default function AdminPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col text-text">
+    <div className="min-h-screen flex flex-col text-text bg-bg-0 relative">
+      {/* Background with library-map.webp darkened with rgba(21,9,4,0.88) and blurred 6px */}
+      <div
+        aria-hidden="true"
+        className="fixed inset-0 z-0 overflow-hidden pointer-events-none select-none"
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/images/library-map.webp"
+          alt=""
+          className="w-full h-full object-cover filter blur-[6px] scale-105 opacity-70"
+        />
+        <div
+          className="absolute inset-0"
+          style={{ backgroundColor: "rgba(21, 9, 4, 0.88)" }}
+        />
+      </div>
+
       <Navbar />
 
-      <main className="flex-1 max-w-7xl w-full mx-auto px-5 sm:px-8 lg:px-10 py-10">
+      <main className="relative z-10 flex-1 max-w-7xl w-full mx-auto px-5 sm:px-8 lg:px-10 py-10">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
           <div>
@@ -121,7 +138,7 @@ export default function AdminPage() {
                 {t.routes.admin.badge}
               </p>
             </div>
-            <h1 className="font-serif text-2xl sm:text-3xl font-normal text-text">
+            <h1 className="font-serif text-3xl sm:text-4xl font-normal text-text">
               {t.routes.admin.title}
             </h1>
             <p className="mt-1 text-xs sm:text-sm text-text-muted">
@@ -129,51 +146,36 @@ export default function AdminPage() {
             </p>
           </div>
 
-          <button
-            type="button"
+          <Button
+            variant="secondary"
+            size="sm"
             onClick={() => fetchItems(activeTab)}
-            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-control border border-border bg-surface hover:bg-surface-solid text-xs font-medium text-text transition-all duration-300 ease-soft shadow-soft hover:shadow-lift hover:-translate-y-0.5 self-start sm:self-auto cursor-pointer"
+            icon={<RefreshCw className="w-3.5 h-3.5 text-accent" />}
           >
-            <RefreshCw className="w-3.5 h-3.5 text-text-muted" />
-            <span>Refresh</span>
-          </button>
+            Refresh
+          </Button>
         </div>
 
-        {/* Filter Tabs */}
-        <div className="flex items-center gap-2.5 border-b border-border pb-3 mb-6">
-          <button
-            type="button"
+        {/* Filter Tabs using Chip */}
+        <div className="flex items-center gap-2 border-b border-border pb-4 mb-6">
+          <Chip
+            active={activeTab === "in_review"}
             onClick={() => setActiveTab("in_review")}
-            className={`px-4 py-2 rounded-control text-xs font-medium transition-all duration-300 ease-soft cursor-pointer ${
-              activeTab === "in_review"
-                ? "bg-accent text-bg-0 shadow-glow"
-                : "bg-surface text-text-muted hover:text-text hover:bg-surface-solid border border-border shadow-soft"
-            }`}
           >
             {t.routes.admin.filterInReview}
-          </button>
-          <button
-            type="button"
+          </Chip>
+          <Chip
+            active={activeTab === "published"}
             onClick={() => setActiveTab("published")}
-            className={`px-4 py-2 rounded-control text-xs font-medium transition-all duration-300 ease-soft cursor-pointer ${
-              activeTab === "published"
-                ? "bg-accent text-bg-0 shadow-glow"
-                : "bg-surface text-text-muted hover:text-text hover:bg-surface-solid border border-border shadow-soft"
-            }`}
           >
             {t.routes.admin.filterPublished}
-          </button>
-          <button
-            type="button"
+          </Chip>
+          <Chip
+            active={activeTab === "all"}
             onClick={() => setActiveTab("all")}
-            className={`px-4 py-2 rounded-control text-xs font-medium transition-all duration-300 ease-soft cursor-pointer ${
-              activeTab === "all"
-                ? "bg-accent text-bg-0 shadow-glow"
-                : "bg-surface text-text-muted hover:text-text hover:bg-surface-solid border border-border shadow-soft"
-            }`}
           >
             {t.routes.admin.filterAll}
-          </button>
+          </Chip>
         </div>
 
         {/* Error Notice */}
@@ -197,7 +199,7 @@ export default function AdminPage() {
 
         {/* Empty State */}
         {!loading && items.length === 0 && (
-          <div className="py-16 text-center max-w-md mx-auto p-8 glass shadow-soft">
+          <div className="py-16 text-center max-w-md mx-auto p-8 glass rounded-card shadow-soft">
             <ShieldCheck className="w-10 h-10 mx-auto text-success mb-3" />
             <h3 className="font-serif text-lg font-medium text-text mb-1">
               {t.routes.admin.noItems}
@@ -208,120 +210,147 @@ export default function AdminPage() {
           </div>
         )}
 
-        {/* Items List */}
+        {/* Simple Glass Table */}
         {!loading && items.length > 0 && (
-          <div className="space-y-4">
-            {items.map((item) => {
-              const primaryMedia = item.media?.[0];
-              const ocr = primaryMedia?.ocr_texts?.[0];
-              const translation = ocr?.translations?.[0]?.text;
-              const isApproved = item.status === "published";
-              const isApproving = approvingId === item.id;
+          <div className="glass rounded-card overflow-hidden shadow-soft">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="bg-surface/80 border-b border-border text-[11px] font-semibold uppercase tracking-wider text-text-muted">
+                    <th className="py-3.5 px-4 sm:px-6">Record / Media</th>
+                    <th className="py-3.5 px-4">Place</th>
+                    <th className="py-3.5 px-4 hidden sm:table-cell">Contributor & Date</th>
+                    <th className="py-3.5 px-4">Status</th>
+                    <th className="py-3.5 px-4 sm:px-6 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border/60 text-sm">
+                  {items.map((item) => {
+                    const primaryMedia = item.media?.[0];
+                    const ocr = primaryMedia?.ocr_texts?.[0];
+                    const translation = ocr?.translations?.[0]?.text;
+                    const isApproved = item.status === "published";
+                    const isApproving = approvingId === item.id;
 
-              return (
-                <div
-                  key={item.id}
-                  className="p-6 glass hover:bg-surface-solid shadow-soft hover:shadow-lift hover:-translate-y-1 transition-all duration-300 ease-soft flex flex-col md:flex-row gap-6 items-start justify-between"
-                >
-                  {/* Media Thumbnail */}
-                  {primaryMedia?.url && (
-                    <div className="w-full md:w-44 md:h-32 shrink-0 rounded-control overflow-hidden border border-border bg-surface-solid shadow-soft">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={primaryMedia.url}
-                        alt={item.title}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  )}
-
-                  {/* Item Details */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex flex-wrap items-center gap-2 mb-2">
-                      <h3 className="font-serif text-base sm:text-lg font-medium text-text truncate">
-                        {item.title.replace(/^\[Illustrative\]\s*/i, "")}
-                      </h3>
-                      <Badge
-                        variant={isApproved ? "ocr" : "gold"}
-                        size="sm"
+                    return (
+                      <tr
+                        key={item.id}
+                        className="group hover:bg-accent/5 transition-colors border-l-2 border-transparent hover:border-accent"
                       >
-                        {item.status}
-                      </Badge>
-                    </div>
+                        {/* 1. Record / Media */}
+                        <td className="py-4 px-4 sm:px-6 align-top">
+                          <div className="flex gap-3.5 items-start">
+                            {primaryMedia?.url && (
+                              <div className="w-16 h-14 sm:w-20 sm:h-16 shrink-0 rounded-control overflow-hidden border border-border bg-surface-solid shadow-soft">
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img
+                                  src={primaryMedia.url}
+                                  alt={item.title}
+                                  className="w-full h-full object-cover"
+                                />
+                              </div>
+                            )}
+                            <div className="min-w-0">
+                              <h3 className="font-serif text-sm sm:text-base font-medium text-text group-hover:text-accent transition-colors">
+                                {item.title.replace(/^\[Illustrative\]\s*/i, "")}
+                              </h3>
+                              {ocr?.original_text && (
+                                <p className="font-devanagari text-xs text-text-muted line-clamp-1 mt-1">
+                                  {ocr.original_text}
+                                </p>
+                              )}
+                              {translation && (
+                                <p className="text-[11px] text-text-muted/80 italic line-clamp-1 mt-0.5">
+                                  {translation}
+                                </p>
+                              )}
+                              <div className="sm:hidden text-[11px] text-text-muted mt-1.5 flex items-center gap-2">
+                                <span>{new Date(item.created_at).toLocaleDateString()}</span>
+                                {item.contributor && (
+                                  <span>• By {item.contributor.replace(/^\[Illustrative\]\s*/i, "")}</span>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        </td>
 
-                    {/* Place info */}
-                    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-text-muted mb-3">
-                      {item.places && (
-                        <div className="flex items-center gap-1">
-                          <MapPin className="w-3 h-3 text-accent" />
-                          <span className="font-medium text-text">
-                            {item.places.name}
-                          </span>
-                          <span className="text-text-muted/60">({item.places.state})</span>
-                        </div>
-                      )}
-                      <div className="flex items-center gap-1 text-text-muted/80">
-                        <Calendar className="w-3 h-3" />
-                        <span>{new Date(item.created_at).toLocaleDateString()}</span>
-                      </div>
-                      {item.contributor && (
-                        <span className="text-text-muted/70 truncate max-w-xs">
-                          By: {item.contributor.replace(/^\[Illustrative\]\s*/i, "")}
-                        </span>
-                      )}
-                    </div>
+                        {/* 2. Place */}
+                        <td className="py-4 px-4 align-top text-xs">
+                          {item.places ? (
+                            <div>
+                              <div className="flex items-center gap-1 font-medium text-text">
+                                <MapPin className="w-3 h-3 text-accent shrink-0" />
+                                <span>{item.places.name}</span>
+                              </div>
+                              <span className="text-[11px] text-text-muted block pl-4">
+                                {item.places.state}
+                              </span>
+                              {item.place_id && (
+                                <Link
+                                  href={`/place/${item.place_id}`}
+                                  target="_blank"
+                                  className="inline-flex items-center gap-1 text-[11px] font-medium text-accent hover:underline mt-1 pl-4"
+                                >
+                                  <span>{t.routes.admin.viewPlace}</span>
+                                  <ExternalLink className="w-2.5 h-2.5" />
+                                </Link>
+                              )}
+                            </div>
+                          ) : (
+                            <span className="text-text-muted">—</span>
+                          )}
+                        </td>
 
-                    {/* OCR snippet */}
-                    {ocr?.original_text && (
-                      <div className="p-3 rounded-control bg-surface-solid border border-border font-devanagari text-xs text-text leading-relaxed mb-2 line-clamp-2">
-                        {ocr.original_text}
-                      </div>
-                    )}
+                        {/* 3. Contributor & Date */}
+                        <td className="py-4 px-4 align-top text-xs text-text-muted hidden sm:table-cell">
+                          <div className="flex items-center gap-1.5">
+                            <Calendar className="w-3 h-3 text-text-muted/70" />
+                            <span>{new Date(item.created_at).toLocaleDateString()}</span>
+                          </div>
+                          {item.contributor && (
+                            <span className="text-[11px] text-text-muted/70 block mt-1 truncate max-w-[140px]">
+                              {item.contributor.replace(/^\[Illustrative\]\s*/i, "")}
+                            </span>
+                          )}
+                        </td>
 
-                    {/* Translation snippet */}
-                    {translation && (
-                      <p className="text-xs text-text/80 italic line-clamp-2 mb-2 border-l-2 border-accent/40 pl-2.5">
-                        {translation}
-                      </p>
-                    )}
+                        {/* 4. Status */}
+                        <td className="py-4 px-4 align-top">
+                          <Badge
+                            variant={isApproved ? "ocr" : "gold"}
+                            size="sm"
+                          >
+                            {item.status}
+                          </Badge>
+                        </td>
 
-                    {/* View Place Dossier Link */}
-                    {item.place_id && (
-                      <Link
-                        href={`/place/${item.place_id}`}
-                        target="_blank"
-                        className="inline-flex items-center gap-1 text-xs font-medium text-accent hover:text-accent-strong transition-colors mt-1"
-                      >
-                        <span>{t.routes.admin.viewPlace}</span>
-                        <ExternalLink className="w-3 h-3" />
-                      </Link>
-                    )}
-                  </div>
-
-                  {/* Action Controls */}
-                  <div className="shrink-0 flex items-center gap-2 self-end md:self-center">
-                    {isApproved ? (
-                      <div className="flex items-center gap-1.5 text-xs font-medium text-success bg-success/10 px-3.5 py-1.5 rounded-pill border border-success/30">
-                        <CheckCircle className="w-4 h-4 text-success" />
-                        <span>{t.routes.admin.approvedBadge}</span>
-                      </div>
-                    ) : (
-                      <Button
-                        variant="primary"
-                        size="sm"
-                        onClick={() => handleApprove(item.id)}
-                        disabled={isApproving}
-                        isLoading={isApproving}
-                      >
-                        {isApproving
-                          ? t.routes.admin.approvingBtn
-                          : t.routes.admin.approveBtn}
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
+                        {/* 5. Actions */}
+                        <td className="py-4 px-4 sm:px-6 align-top text-right">
+                          {isApproved ? (
+                            <div className="inline-flex items-center gap-1.5 text-xs font-medium text-success bg-success/10 px-3 py-1 rounded-pill border border-success/30">
+                              <CheckCircle className="w-3.5 h-3.5 text-success" />
+                              <span>{t.routes.admin.approvedBadge}</span>
+                            </div>
+                          ) : (
+                            <Button
+                              variant="primary"
+                              size="sm"
+                              onClick={() => handleApprove(item.id)}
+                              disabled={isApproving}
+                              isLoading={isApproving}
+                            >
+                              {isApproving
+                                ? t.routes.admin.approvingBtn
+                                : t.routes.admin.approveBtn}
+                            </Button>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
       </main>

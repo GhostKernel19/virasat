@@ -55,7 +55,7 @@ function highlightMatch(text: string, query: string): React.ReactNode {
         return (
           <mark
             key={index}
-            className="bg-gold/30 text-ink font-semibold rounded px-0.5"
+            className="bg-accent-2/25 text-accent-2 font-semibold rounded px-1 py-0.5"
           >
             {part}
           </mark>
@@ -265,13 +265,13 @@ function SearchContent() {
   const passages = results?.passages || [];
 
   return (
-    <main className="flex-1 max-w-7xl w-full mx-auto px-5 sm:px-8 lg:px-10 py-10">
+    <main className="relative z-10 flex-1 max-w-7xl w-full mx-auto px-5 sm:px-8 lg:px-10 py-10">
       {/* Header Badge & Title */}
       <div className="mb-6">
         <p className="text-[11px] font-bold tracking-widest text-accent uppercase mb-1">
           {t.routes.search.badge}
         </p>
-        <h1 className="font-serif text-2xl sm:text-3xl font-normal text-text">
+        <h1 className="font-serif text-3xl sm:text-4xl font-normal text-text">
           {t.routes.search.title}
         </h1>
         <p className="mt-1 text-xs sm:text-sm text-text-muted">
@@ -279,34 +279,34 @@ function SearchContent() {
         </p>
       </div>
 
-      {/* Search Bar & Type Filter Control */}
-      <div className="p-5 glass shadow-soft mb-8">
-        <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3">
-          {/* Input container */}
+      {/* Large Glass Search Field & Pill Filter Dropdown */}
+      <div className="p-4 sm:p-5 glass rounded-card shadow-soft mb-8">
+        <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
+          {/* Large glass input container */}
           <div className="relative flex-1">
             <input
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder={t.routes.search.placeholder}
-              className="w-full pl-9 pr-8 py-2.5 rounded-control border border-border bg-surface-solid text-xs sm:text-sm text-text placeholder:text-text-muted focus:outline-none focus:border-accent focus:bg-surface transition-all duration-300 ease-soft"
+              className="w-full pl-11 pr-10 py-3.5 rounded-control border border-border bg-surface-solid/80 text-sm sm:text-base text-text placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-all duration-300 ease-soft shadow-soft"
             />
-            <Search className="w-4 h-4 text-text-muted absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <Search className="w-5 h-5 text-accent absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
             {query && (
               <button
                 type="button"
                 onClick={handleClear}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-text-muted hover:text-text transition-colors p-1"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-accent transition-colors p-1"
                 aria-label="Clear search"
               >
-                <X className="w-3.5 h-3.5" />
+                <X className="w-4 h-4" />
               </button>
             )}
           </div>
 
-          {/* Place Type Filter Dropdown */}
-          <div className="flex items-center gap-2">
-            <label htmlFor="place-type" className="text-xs text-text-muted shrink-0">
+          {/* Place Type Filter Dropdown - Pill Shape */}
+          <div className="flex items-center gap-2 shrink-0">
+            <label htmlFor="place-type" className="text-xs text-text-muted shrink-0 sr-only sm:not-sr-only">
               {t.routes.search.typeFilterLabel}
             </label>
             <select
@@ -317,7 +317,7 @@ function SearchContent() {
                 const newType = isAllTypes(val) ? "" : val;
                 setSelectedType(newType);
               }}
-              className="px-3 py-2.5 rounded-control border border-border bg-surface-solid text-xs sm:text-sm text-text focus:outline-none focus:border-accent focus:bg-surface cursor-pointer transition-all duration-300 ease-soft"
+              className="px-4 py-3 rounded-pill border border-border bg-surface-solid/80 text-xs sm:text-sm text-text focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent cursor-pointer transition-all duration-300 ease-soft"
             >
               <option value="">{t.routes.search.allTypes}</option>
               <option value="Stepwell">Stepwell</option>
@@ -355,7 +355,7 @@ function SearchContent() {
 
       {/* Empty State: Query Executed, No Error, but BOTH Places and Passages are Empty */}
       {!loading && !errorMessage && hasSearched && places.length === 0 && passages.length === 0 && (
-        <div className="py-16 text-center max-w-md mx-auto p-8 glass shadow-soft">
+        <div className="py-16 text-center max-w-md mx-auto p-8 glass rounded-card shadow-soft">
           <div className="w-10 h-10 rounded-pill bg-surface-solid text-text-muted flex items-center justify-center mx-auto mb-3">
             <Search className="w-5 h-5" />
           </div>
@@ -370,8 +370,8 @@ function SearchContent() {
 
       {/* Initial Hint: Search Box Empty */}
       {!loading && !hasSearched && (
-        <div className="py-16 text-center max-w-lg mx-auto text-ink/60">
-          <Search className="w-8 h-8 mx-auto text-ink/25 mb-3" />
+        <div className="py-16 text-center max-w-lg mx-auto text-text-muted">
+          <Search className="w-8 h-8 mx-auto text-accent/40 mb-3" />
           <p className="text-xs sm:text-sm leading-relaxed">
             {t.routes.search.initialPrompt}
           </p>
@@ -387,7 +387,7 @@ function SearchContent() {
               <div className="flex items-center justify-between border-b border-border pb-2.5 mb-4">
                 <h2
                   id="section-places"
-                  className="font-serif text-lg sm:text-xl font-normal text-text flex items-center gap-2"
+                  className="font-serif text-xl sm:text-2xl font-normal text-text flex items-center gap-2"
                 >
                   <span>{t.routes.search.placesTitle}</span>
                   <span className="text-xs text-text-muted font-sans">
@@ -401,7 +401,7 @@ function SearchContent() {
                   <Link
                     key={place.id}
                     href={`/place/${place.id}`}
-                    className="p-5.5 glass hover:bg-surface-solid hover:border-accent shadow-soft hover:shadow-lift hover:-translate-y-1 transition-all duration-300 ease-soft flex flex-col justify-between group no-underline text-text"
+                    className="p-6 glass rounded-card hover:bg-surface-solid/80 hover:border-accent shadow-soft hover:shadow-lift hover:-translate-y-1 transition-all duration-300 ease-soft flex flex-col justify-between group no-underline text-text"
                   >
                     <div>
                       <div className="flex items-start justify-between gap-2 mb-1.5">
@@ -448,7 +448,7 @@ function SearchContent() {
               <div className="flex items-center justify-between border-b border-border pb-2.5 mb-4">
                 <h2
                   id="section-passages"
-                  className="font-serif text-lg sm:text-xl font-normal text-text flex items-center gap-2"
+                  className="font-serif text-xl sm:text-2xl font-normal text-text flex items-center gap-2"
                 >
                   <span>{t.routes.search.passagesTitle}</span>
                   <span className="text-xs text-text-muted font-sans">
@@ -461,7 +461,7 @@ function SearchContent() {
                 {passages.map((passage) => (
                   <div
                     key={passage.ocr_id}
-                    className="p-6 glass hover:bg-surface-solid shadow-soft hover:shadow-lift hover:-translate-y-1 transition-all duration-300 ease-soft flex flex-col gap-3.5"
+                    className="p-6 glass rounded-card hover:bg-surface-solid/80 shadow-soft hover:shadow-lift hover:-translate-y-1 transition-all duration-300 ease-soft flex flex-col gap-3.5"
                   >
                     {/* Header: Place name & matched field badge */}
                     <div className="flex flex-wrap items-center justify-between gap-2">
@@ -529,11 +529,28 @@ export default function SearchPage() {
   const { t } = useLanguage();
 
   return (
-    <div className="min-h-screen flex flex-col text-text">
+    <div className="min-h-screen flex flex-col text-text bg-bg-0 relative">
+      {/* Background with library-map.webp darkened with rgba(21,9,4,0.88) and blurred 6px */}
+      <div
+        aria-hidden="true"
+        className="fixed inset-0 z-0 overflow-hidden pointer-events-none select-none"
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/images/library-map.webp"
+          alt=""
+          className="w-full h-full object-cover filter blur-[6px] scale-105 opacity-70"
+        />
+        <div
+          className="absolute inset-0"
+          style={{ backgroundColor: "rgba(21, 9, 4, 0.88)" }}
+        />
+      </div>
+
       <Navbar />
       <Suspense
         fallback={
-          <div className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-16 flex flex-col items-center justify-center text-text-muted">
+          <div className="relative z-10 flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-16 flex flex-col items-center justify-center text-text-muted">
             <Loader2 className="w-7 h-7 animate-spin text-accent mb-2" />
             <p className="text-xs sm:text-sm">{t.routes.search.loading}</p>
           </div>
