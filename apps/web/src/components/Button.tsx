@@ -37,7 +37,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     if (size === "sm") {
       sizeClasses = "text-xs px-3.5 py-1.5 rounded-pill gap-1.5";
     } else if (size === "lg") {
-      sizeClasses = "text-base px-7 py-3 rounded-pill gap-2.5";
+      sizeClasses = "text-[15px] sm:text-base px-7 py-3 rounded-pill gap-2.5 font-medium";
     }
 
     let variantClasses = "";
@@ -48,7 +48,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         break;
       case "secondary":
         variantClasses =
-          "bg-transparent text-text border border-border hover:border-text/60 hover:text-text hover:bg-surface/30 active:scale-[0.98] font-medium transition-all duration-300 ease-soft";
+          "bg-[rgba(21,9,4,0.45)] backdrop-blur-[10px] text-text border border-[rgba(245,230,211,0.28)] hover:border-text/60 hover:text-text hover:bg-[rgba(21,9,4,0.65)] active:scale-[0.98] font-medium transition-all duration-300 ease-soft";
         break;
       case "outline":
         variantClasses =

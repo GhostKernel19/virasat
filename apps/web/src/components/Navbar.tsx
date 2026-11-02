@@ -32,18 +32,18 @@ export function Navbar({ savedCount = 3 }: NavbarProps) {
 
   return (
     <>
-      <header className="fixed top-0 left-0 right-0 z-50 w-full bg-surface/85 backdrop-blur-[14px]">
-        <div className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-10 h-16 flex items-center justify-between">
-          {/* Brand / Logo */}
+      <header className="fixed top-0 left-0 right-0 z-50 w-full bg-surface/85 backdrop-blur-[14px] border-b border-border/20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-10 h-16 flex items-center justify-between gap-3 sm:gap-6">
+          {/* Brand / Logo (shrink-0 to prevent overlap) */}
           <Link
             href="/"
-            className="flex items-center gap-2.5 group no-underline select-none"
+            className="flex items-center gap-2 sm:gap-2.5 group no-underline select-none shrink-0"
           >
             {/* Heritage Pin Icon with Inner Arch */}
             <div className="shrink-0 text-accent transition-transform group-hover:scale-105">
               <svg
-                width="30"
-                height="30"
+                width="28"
+                height="28"
                 viewBox="0 0 32 32"
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
@@ -73,20 +73,20 @@ export function Navbar({ savedCount = 3 }: NavbarProps) {
               </svg>
             </div>
 
-            <span className="font-devanagari-heading text-2xl font-bold tracking-tight text-accent leading-none">
+            <span className="font-devanagari-heading text-xl sm:text-2xl font-bold tracking-tight text-accent leading-none">
               विरासत
             </span>
           </Link>
 
-          {/* Center Navigation Links */}
-          <nav className="flex items-center gap-7 sm:gap-9">
+          {/* Center Navigation Links (shrink-0 to maintain spacing) */}
+          <nav className="flex items-center gap-3.5 sm:gap-7 md:gap-9 shrink-0">
             {navLinks.map((link) => {
               const isActive = link.match(pathname);
               return (
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`relative text-xs uppercase tracking-widest font-medium transition-colors ${
+                  className={`relative text-[11px] sm:text-xs uppercase tracking-wider sm:tracking-widest font-medium transition-colors ${
                     isActive
                       ? "text-accent"
                       : "text-text-muted hover:text-text"
@@ -102,19 +102,22 @@ export function Navbar({ savedCount = 3 }: NavbarProps) {
           </nav>
 
           {/* Right Section: Language Toggle & Saved Count */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2.5 sm:gap-4 shrink-0">
             {/* The EN | मराठी toggle is a pill with the active language highlighted */}
             <LanguageToggle />
 
             {/* Saved link at the right */}
             <Link
               href="/explore"
-              className="flex items-center gap-1.5 text-xs uppercase tracking-wider font-medium text-text-muted hover:text-accent transition-colors group cursor-pointer no-underline"
+              className="flex items-center gap-1.5 text-[11px] sm:text-xs uppercase tracking-wider font-medium text-text-muted hover:text-accent transition-colors group cursor-pointer no-underline"
               title={`${formattedSavedCount} items saved`}
             >
               <Bookmark className="w-3.5 h-3.5 text-text-muted group-hover:text-accent transition-colors" />
-              <span>
+              <span className="hidden sm:inline">
                 {t.nav.saved} ({formattedSavedCount})
+              </span>
+              <span className="sm:hidden font-mono">
+                ({formattedSavedCount})
               </span>
             </Link>
           </div>

@@ -18,7 +18,6 @@ if (typeof window !== "undefined") {
 export default function HomePage() {
   const { language, t } = useLanguage();
   const [places, setPlaces] = useState<Place[]>(FALLBACK_PLACES);
-  const [imageError, setImageError] = useState(false);
 
   // Animation references
   const heroBgRef = useRef<HTMLImageElement | null>(null);
@@ -210,27 +209,28 @@ export default function HomePage() {
       <Navbar />
 
       {/* SECTION 1: COVER (100vh) */}
-      <section className="relative h-screen min-h-screen w-full overflow-hidden isolate flex flex-col justify-between items-center text-center px-5 sm:px-8 lg:px-10 pt-20 pb-16 select-none">
-        {/* Background image with Ken Burns slow zoom (GSAP) */}
+      <section className="relative min-h-screen w-full overflow-hidden isolate flex flex-col justify-between items-center text-center px-4 sm:px-8 select-none">
+        {/* Background image with Ken Burns slow zoom (GSAP): hero.webp only */}
         <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-          {!imageError ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              ref={heroBgRef}
-              src="/images/hero.webp"
-              alt=""
-              onError={() => setImageError(true)}
-              className="w-full h-full object-cover will-change-transform"
-            />
-          ) : (
-            <div className="w-full h-full bg-gradient-to-b from-bg-1 via-bg-0 to-bg-0 hero-radial-overlay" />
-          )}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            ref={heroBgRef}
+            src="/images/hero.webp"
+            alt=""
+            className="w-full h-full object-cover will-change-transform"
+          />
         </div>
 
-        {/* Dark gradient overlay for text readability */}
+        {/* Overlay: linear-gradient(to bottom, rgba(21,9,4,0.55), rgba(21,9,4,0.35) 40%, rgba(21,9,4,0.8)) plus radial darkening behind text */}
         <div
           aria-hidden="true"
-          className="absolute inset-0 z-[1] bg-gradient-to-b from-bg-0/60 via-bg-0/75 to-bg-0 pointer-events-none"
+          className="absolute inset-0 z-[1] pointer-events-none"
+          style={{
+            background: `
+              radial-gradient(ellipse at center, rgba(21, 9, 4, 0.75) 0%, rgba(21, 9, 4, 0.4) 50%, transparent 80%),
+              linear-gradient(to bottom, rgba(21, 9, 4, 0.55), rgba(21, 9, 4, 0.35) 40%, rgba(21, 9, 4, 0.8))
+            `,
+          }}
         />
 
         {/* Slow warm haze: two blurred radial gradients drifting over 20s at opacity 0.15 */}
@@ -257,19 +257,20 @@ export default function HomePage() {
         {/* BirdFlock drifting slowly across upper cover */}
         <BirdFlock />
 
-        {/* Centred Cover Content */}
+        {/* Centred Cover Content: Flex column with fixed gaps and no absolute positioning inside */}
         <div
           ref={coverContentRef}
-          className="relative z-10 max-w-4xl mx-auto flex flex-col items-center justify-center my-auto pt-6"
+          className="relative z-10 w-full max-w-5xl mx-auto flex flex-col items-center justify-center text-center my-auto pt-24 pb-8"
         >
-          {/* Pin icon in accent with a soft glow */}
-          <div className="cover-animate-item text-accent filter drop-shadow-[0_0_18px_rgba(232,131,74,0.6)] mb-2">
+          {/* 1. Pin icon 56px */}
+          <div className="cover-animate-item text-accent filter drop-shadow-[0_0_24px_rgba(232,131,74,0.6)] shrink-0 w-14 h-14 flex items-center justify-center">
             <svg
-              width="36"
-              height="36"
+              width="56"
+              height="56"
               viewBox="0 0 32 32"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
+              className="w-14 h-14"
             >
               <path
                 d="M16 3C10.477 3 6 7.477 6 13C6 20.5 16 29 16 29C16 29 26 20.5 26 13C26 7.477 21.523 3 16 3Z"
@@ -295,44 +296,85 @@ export default function HomePage() {
             </svg>
           </div>
 
-          {/* Marathi wordmark "विरासत" (gradient text) */}
-          <div className="cover-animate-item">
-            <span className="font-devanagari-heading text-3xl sm:text-4xl font-bold bg-gradient-to-r from-[#F7C9A3] via-[#E8834A] to-[#C65D3B] bg-clip-text text-transparent leading-none">
+          {/* 16px gap -> then Marathi wordmark विरासत (clamp 56 to 88px, line-height 1.2 with enough top padding so headline stroke is not clipped) */}
+          <div
+            className="cover-animate-item pt-2 sm:pt-3"
+            style={{ marginTop: 16 }}
+          >
+            <span
+              className="font-devanagari-heading font-bold bg-gradient-to-r from-[#F7C9A3] via-[#E8834A] to-[#C65D3B] bg-clip-text text-transparent block select-none"
+              style={{
+                fontSize: "clamp(56px, 6vw, 88px)",
+                lineHeight: 1.2,
+              }}
+            >
               विरासत
             </span>
           </div>
 
-          {/* Large serif "VIRASAT" wordmark (gradient peach to terracotta) */}
-          <div className="cover-animate-item mt-1">
-            <span className="font-serif text-5xl sm:text-7xl lg:text-8xl font-black tracking-tight uppercase bg-gradient-to-r from-[#F7C9A3] via-[#E8834A] to-[#C65D3B] bg-clip-text text-transparent leading-none drop-shadow-[0_4px_24px_rgba(232,131,74,0.25)]">
+          {/* 8px gap -> then VIRASAT serif (clamp 72 to 140px, line-height 1, letter-spacing 0.02em) */}
+          <div
+            className="cover-animate-item"
+            style={{ marginTop: 8 }}
+          >
+            <span
+              className="font-serif font-black uppercase bg-gradient-to-r from-[#F7C9A3] via-[#E8834A] to-[#C65D3B] bg-clip-text text-transparent block select-none drop-shadow-[0_4px_30px_rgba(232,131,74,0.3)]"
+              style={{
+                fontSize: "clamp(72px, 9vw, 140px)",
+                lineHeight: 1,
+                letterSpacing: "0.02em",
+              }}
+            >
               VIRASAT
             </span>
           </div>
 
-          {/* Letter-spaced "A LIVING HERITAGE ATLAS" */}
-          <p className="cover-animate-item text-xs sm:text-sm font-semibold tracking-[0.3em] uppercase text-text/85 mt-2">
+          {/* 20px gap -> then letter-spaced "A LIVING HERITAGE ATLAS" */}
+          <p
+            className="cover-animate-item text-xs sm:text-sm font-semibold tracking-[0.3em] uppercase text-text/85"
+            style={{ marginTop: 20 }}
+          >
             {t.routes.home.livingAtlas}
           </p>
 
-          {/* Small orange tagline "PLACES REMEMBER. RECORDS CONNECT." */}
-          <p className="cover-animate-item text-[11px] sm:text-xs font-bold tracking-[0.25em] uppercase text-accent mt-4">
+          {/* 40px gap -> then orange tagline */}
+          <p
+            className="cover-animate-item text-[11px] sm:text-xs font-bold tracking-[0.25em] uppercase text-accent"
+            style={{ marginTop: 40 }}
+          >
             {t.routes.home.tagline}
           </p>
 
-          {/* Serif headline "From archival graveyard to living heritage map." */}
-          <h1 className="cover-animate-item font-serif text-2xl sm:text-4xl lg:text-5xl font-normal text-text max-w-3xl mx-auto leading-tight mt-3">
+          {/* 12px gap -> then serif headline (max-width 900px, text-wrap balance) */}
+          <h1
+            className="cover-animate-item font-serif text-2xl sm:text-4xl lg:text-5xl font-normal text-text leading-tight w-full max-w-[900px] mx-auto px-4"
+            style={{
+              marginTop: 12,
+              textWrap: "balance",
+            }}
+          >
             {t.routes.home.headline}
           </h1>
 
-          {/* One muted sentence */}
-          <p className="cover-animate-item text-sm sm:text-base text-text-muted max-w-2xl mx-auto leading-relaxed mt-3 px-4">
+          {/* 16px gap -> then paragraph (max-width 640px) */}
+          <p
+            className="cover-animate-item text-sm sm:text-base text-text-muted max-w-[640px] mx-auto leading-relaxed px-4"
+            style={{ marginTop: 16 }}
+          >
             {t.routes.home.description}
           </p>
 
-          {/* Three pill buttons */}
-          <div className="cover-animate-item mt-7 flex flex-wrap items-center justify-center gap-3.5">
+          {/* 36px gap -> then buttons row */}
+          <div
+            className="cover-animate-item flex flex-wrap items-center justify-center gap-4 px-4"
+            style={{ marginTop: 36 }}
+          >
             <Link href="/explore">
-              <Button variant="secondary" size="lg">
+              <Button
+                variant="secondary"
+                size="lg"
+                className="bg-[rgba(21,9,4,0.45)] backdrop-blur-[10px] border border-[rgba(245,230,211,0.28)] text-text text-[15px] sm:text-base font-medium hover:bg-[rgba(21,9,4,0.65)] hover:border-text/60 shadow-soft hover:-translate-y-0.5"
+              >
                 {t.routes.home.ctaExploreMap}
               </Button>
             </Link>
@@ -341,6 +383,7 @@ export default function HomePage() {
               ref={primaryBtnRef}
               variant="primary"
               size="lg"
+              className="text-[15px] sm:text-base font-medium shadow-glow"
               iconRight={<ArrowDown className="w-4 h-4" />}
               onClick={scrollToSection2}
             >
@@ -348,30 +391,36 @@ export default function HomePage() {
             </Button>
 
             <Link href="/contribute">
-              <Button variant="secondary" size="lg">
+              <Button
+                variant="secondary"
+                size="lg"
+                className="bg-[rgba(21,9,4,0.45)] backdrop-blur-[10px] border border-[rgba(245,230,211,0.28)] text-text text-[15px] sm:text-base font-medium hover:bg-[rgba(21,9,4,0.65)] hover:border-text/60 shadow-soft hover:-translate-y-0.5"
+              >
                 {t.routes.home.ctaContributeRecord}
               </Button>
             </Link>
           </div>
         </div>
 
-        {/* Bottom bar */}
-        <div className="relative z-20 w-full max-w-7xl mx-auto px-5 sm:px-8 lg:px-10 flex items-center justify-between text-[11px] uppercase tracking-widest text-text-muted">
-          <div className="hidden sm:block font-medium">
-            {t.routes.home.bottomBarLeft}
+        {/* Bottom bar on a dark gradient strip so it is readable */}
+        <div className="relative z-20 w-full bg-gradient-to-t from-bg-0 via-bg-0/90 to-transparent pt-10 pb-6 mt-auto">
+          <div className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-10 flex items-center justify-between text-xs tracking-widest uppercase text-text/75 font-medium">
+            <div className="hidden sm:block">
+              {t.routes.home.bottomBarLeft}
+            </div>
+
+            <button
+              type="button"
+              onClick={scrollToSection2}
+              className="mx-auto sm:mx-0 flex items-center gap-2 text-text/75 hover:text-accent transition-colors cursor-pointer group"
+              aria-label={t.routes.home.scrollToDiscover}
+            >
+              <span>{t.routes.home.scrollToDiscover}</span>
+              <ArrowDown className="w-3.5 h-3.5 group-hover:translate-y-1 transition-transform animate-bounce" />
+            </button>
+
+            <div className="hidden sm:block w-36" aria-hidden="true" />
           </div>
-
-          <button
-            type="button"
-            onClick={scrollToSection2}
-            className="mx-auto sm:mx-0 flex items-center gap-2 font-medium hover:text-accent transition-colors cursor-pointer group"
-            aria-label={t.routes.home.scrollToDiscover}
-          >
-            <span>{t.routes.home.scrollToDiscover}</span>
-            <ArrowDown className="w-3.5 h-3.5 group-hover:translate-y-1 transition-transform animate-bounce" />
-          </button>
-
-          <div className="hidden sm:block w-36" aria-hidden="true" />
         </div>
       </section>
 
